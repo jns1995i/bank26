@@ -418,13 +418,14 @@ main {
     color: white;
     padding: 10px;
     border-radius: 1.5rem;
+    color: white;
     background: 
-        radial-gradient(circle at 10% 5%, var(--shade15), transparent 15%),
-        radial-gradient(circle at 1% 1%,  var(--shade5), transparent 30%),
-        radial-gradient(circle at 90% 95%,  var(--radial3), transparent 30%);
-    background-blend-mode: lighten;
-    backdrop-filter: blur(10px);
-    background-color: var(--shade11);
+        radial-gradient(circle at 70% 10%, var(--tint10), transparent 80%),  /* Light Gray */
+        radial-gradient(circle at 88% 99%,  var(--tint9), transparent 26%),  /* Very Light Blue */
+        radial-gradient(circle at 20% 1%,  var(--blue900), transparent 70%); /* White */
+    background-blend-mode: multiply;
+    backdrop-filter: blur(50px);
+    background-color: var(--tint12);
 }
 .mainf {
     width: 85%;

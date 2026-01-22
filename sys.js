@@ -376,6 +376,11 @@ app.post('/login', async (req, res) => {
 });
 
 
+app.get('/dsb', isLogin, async (req, res) => {
+  res.render('dsb', { title: 'Dashboard', active: 'dsb' });
+});
+
+
 
 app.use((req, res) => {
   res.status(404);
