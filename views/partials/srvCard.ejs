@@ -1,0 +1,133 @@
+
+            
+
+
+    <section class="col alignStart info corner16 padding5 bgSoft">
+        <section class="corner16 justifyBetween relative">
+            <section class="size20 str500 width0 padding0">
+                <img src="<%= request.requestBy?.photo || '/images/profile.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.png';" class="h40 w40 corner500 marginRight5">
+                <section class="padding0 col alignStart gap0 paddingLeft10 width0">
+                    <p class="size10 darkGray">Requested By</p>
+                    <p class="size20 str500">
+                    <%= request.requestBy ? request.requestBy.fName : '' %>
+                    <%= request.requestBy ? request.requestBy.mName : '' %>
+                    <%= request.requestBy ? request.requestBy.lName : '' %>
+                    <%= request.requestBy ? request.requestBy.xName : '' %>
+                    </p>
+                </section>
+            </section>
+            <a href="javascript:void(0)" id="showBtn" class="size16"><i class="fas fa-chevron-down"></i></a>
+        </section>
+        <section class="paddingInline10 col alignStart bgWhite corner15 hidden" id="showCard">
+            <section class="width0 gap20 padding0">
+                <p class="rem12">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <%= request.requestBy ? request.requestBy.role : '' %>
+                </p>
+                <p class="rem12">
+                    <i class="bi bi-buildings-fill"></i>
+                    <%= request.requestBy ? request.requestBy.campus : '' %>
+                </p>
+            </section>
+            <p class="rem12">
+                <i class="fas fa-address-card"></i>
+                <%= request.requestBy?.schoolId || "--" %>
+            </p>
+            <p class="rem12 str500"><i class="fas fa-layer-group w15 wMin15"></i> <%= request.requestBy?.course || "--" %></p>
+
+            <% if (request.requestBy?.role === 'Alumni') { %>
+                <p class="rem12 str500">
+                    <i class="fas fa-graduation-cap w15"></i>
+                    Graduated in <%= request.requestBy.yearGraduated || "--" %>
+                </p>
+
+            <% } else if (request.requestBy?.role === 'Former') { %>
+                <p class="rem12 str500">
+                    <i class="fas fa-stream w15"></i>
+                    <%= request.requestBy?.yearLevel || "--" %> last <%= request.requestBy?.yearAttended || "--" %>
+                </p>
+
+            <% } else { %>
+                <p class="rem12 str500">
+                    <i class="fas fa-stream w15"></i>
+                    <%= request.requestBy?.yearLevel || "--" %>
+                </p>
+            <% } %>
+
+            <p class="rem12 str500"><i class="fas fa-envelope w15"></i> <%= request.requestBy?.email || "--" %></p>
+            <p class="rem12 str500"><i class="fas fa-phone w15"></i> <%= request.requestBy?.phone || "--" %></p>
+            <p class="rem12 str500"><i class="fas fa-house w15"></i> <%= request.requestBy?.address || "--" %></p>
+        </section>
+    </section>
+
+    <section class="padding10 corner15 justifyBetween bgSoft">
+        <% const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            hour12: true }; 
+        const formattedDate = new Date(request.createdAt).toLocaleString('en-US', options); %>
+        <section class="padding0 col alignStart width0 marginLeft10">
+            <p class="rem11"> <i class="fas fa-receipt"></i> Transaction No</p>
+            <p class="rem14 str400"><%= request.tr %></p>
+        </section>
+        <section class="padding0 col alignStart width0">
+            <p class="rem11"><i class="fas fa-calendar"></i> Requested Date</p>
+            <p class="rem14 str400"><%= formattedDate %></p>
+        </section>
+        <section class="corner12 col alignStart bgWhite width0 relative padding15">
+            <p class="rem11"> <i class="fas fa-coins"></i> Total Payables</p>
+            <p class="rem16 str400 flex gap10 justifyCenter alignCenter">
+                &#8369;<%= totalAmount || "0" %>.00 
+                <% if ( request.status === "For Verification") { %>
+                <span class="bgBlue100 border0 width0"> <i class="fas fa-check-circle"></i> Paid </span>
+                <% } else if (  request.status === "Verified" ) { %>
+                <span class="bgGreen100 border0 width0"> <i class="fas fa-check-circle"></i> Verified </span>
+                <% } else { %>
+                <span class="bgBlue100 border0 width0">Pending</span>
+                <% } %>
+            </p>
+        </section>
+    </section>
+<% if (user.role === "Accounting") { %>
+    <% if (["For Verification", "Verified", "Claimed", "For Release"].includes(request.status)) { %>
+        <% if (request.payPhoto && request.payPhoto.length > 0) { %>
+        <section class="corner15 gap20 padding5 bgSoft justifyBetween">
+            <section class="size16 str400 width0">View Payment Here <i class="fas fa-arrow-right marginLeft5"></i> </section>
+
+            <section class="gap20 bgWhite corner15 width0">
+                    <% request.payPhoto.forEach((photo, index) => { %>
+                        <a href="<%= photo %>" target="_blank" class="nav">
+                            <i class="fas fa-eye"></i> Payment <%= index + 1 %>
+                        </a>
+                    <% }) %>
+            </section>
+        </section>
+        <% } else { %>
+        <% } %>
+    <% } %>
+<% } %>
+                <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const btn = document.querySelector('#showBtn');
+                    const card = document.querySelector('#showCard');
+                    const icon = btn.querySelector('i');
+
+                    btn.addEventListener('click', () => {
+                        card.classList.toggle('hidden');
+                        icon.classList.toggle('rotate-icon'); // rotate on toggle
+                    });
+                });
+                </script>
+                <style>
+                    #showBtn i {
+                    transition: transform 0.6s ease; /* smooth rotation */
+                }
+
+                .rotate-icon {
+                    transform: rotate(180deg); /* flip down/up */
+                }
+
+                </style>

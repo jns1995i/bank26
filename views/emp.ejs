@@ -1,0 +1,311 @@
+<% layout('layout') %>
+<style>
+    .empCard a {
+        transition: all 0.6s ease-in-out;
+    }
+    .empCard a:hover {
+        transform: scale(1.02);
+        filter: drop-shadow(0 2px 1px #0000002e);
+    }
+    .mainf {
+        padding: 20px;
+        overflow-y: hidden;
+    }
+    
+    .unseen2 {
+        right: -100%;
+        overflow: hidden;
+        transition: right 0.6s ease-in-out;
+        z-index: 100;
+    }
+    .seen2 {
+        right: 0;
+        transition: right 0.4s ease-in-out;
+        z-index: 100;
+    }
+</style>
+
+<div class="bgWhite unseen2 fixed top0 col empCard2 width50 shadow2 justifyStart padding20" id="empCard">
+    <section class="justifyStart padding10">
+        <a href="javascript:void(0)" class="nav cnav porcelain" id="empClose"><i class="fas fa-angles-right"></i></a>
+    </section>
+    <br>
+    <form action="/newEmp" method="POST" class="gap30 row padding30 alignStart empCard2 porcelain">
+        <section class="col alignStart gap10">
+            <p class="rem24 str500">New Employee</p>
+            <div class="field gap5">
+                <label for="">First Name*</label>
+                <input type="text" name="firstName" required class="sname">
+            </div>
+            <div class="field gap5">
+                <label for="">Middle Name</label>
+                <input type="text" name="middleName" class="sname">
+            </div>
+            <div class="field gap5">
+                <label for="">Last Name*</label>
+                <input type="text" name="lastName" required class="sname">
+            </div>
+            <div class="field gap5">
+                <label for="">Extension Name</label>
+                <input type="text" name="extName" class="sname">
+            </div>
+            <div class="field gap5">
+                <label for="">Phone Number*</label>
+                <input type="text" id="number" name="number" inputmode="numeric" required class="number">
+            </div>
+        </section>
+        <section class="col alignStart gap10">
+            <div class="field gap5">
+                <label for="">Email*</label>
+                <input type="email" name="email" id="em" required>
+            </div>
+            <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const firstNameInput = document.querySelector('input[name="firstName"]');
+  const middleNameInput = document.querySelector('input[name="middleName"]');
+  const lastNameInput = document.querySelector('input[name="lastName"]');
+  const emailInput = document.querySelector('input[name="email"]');
+
+  function generateEmail() {
+    const firstName = firstNameInput.value.trim();
+    const middleName = middleNameInput.value.trim();
+    const lastName = lastNameInput.value.trim();
+
+    if (!firstName || !lastName) return; // require at least first and last name
+
+    // Take first letter of first name
+    const firstInitial = firstName.charAt(0).toLowerCase();
+
+    // Take first letter of middle name (if exists)
+    const middleInitial = middleName ? middleName.charAt(0).toLowerCase() : '';
+
+    // Take full last name
+    const last = lastName.toLowerCase();
+
+    const generatedEmail = `${firstInitial}${middleInitial}${last}.au@phinmaed.com`;
+
+    // Only set email if user hasn’t manually changed it
+    if (!emailInput.dataset.userEdited) {
+      emailInput.value = generatedEmail;
+    }
+  }
+
+  // Detect if user edits email manually
+  emailInput.addEventListener('input', () => {
+    emailInput.dataset.userEdited = true;
+  });
+
+  // Generate email when first/middle/last name changes
+  [firstNameInput, middleNameInput, lastNameInput].forEach(input => {
+    input.addEventListener('input', generateEmail);
+  });
+});
+</script>
+
+            
+            <section class="bgRed100 width0 hidden" id="error">Email is already used by an existing account!</section>
+            <script>
+                document.getElementById('em').addEventListener('input', function () {
+                    const email = this.value;
+                
+                    fetch(`/check-email?email=${encodeURIComponent(email)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const errorMsg = document.getElementById('error');
+                            if (data.exists) {
+                                errorMsg.classList.remove('hidden');
+                            } else {
+                                errorMsg.classList.add('hidden');
+                            }
+                        });
+                });
+            </script>
+
+
+            <div class="field gap5">
+                <div class="height0 justifyBetween">
+                    <label for="sn" id="snLabel">Employee Number <span class="hidden">(Optional)</span></label>
+                </div>
+                <input type="text" id="sn" name="studentNo" placeholder="">
+            </div>
+            
+            <section class="bgRed100 width0 hidden" id="error2">Employee number is already registered!</section>
+            <script>
+                document.getElementById('sn').addEventListener('input', function () {
+                    const studentNo = this.value;
+                
+                    fetch(`/check-studentNo?studentNo=${encodeURIComponent(studentNo)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const errorMsg = document.getElementById('error2');
+                            if (data.exists) {
+                                errorMsg.classList.remove('hidden');
+                            } else {
+                                errorMsg.classList.add('hidden');
+                            }
+                        });
+                });
+            </script>
+            <div class="field gap5">
+                <label for="">Campus*</label>
+                <div class="selectBar">
+                    <select name="campus" id="campus" required>
+                        <option value="" selected disabled>Select</option>
+                        <option value="Main">Main</option>
+                        <option value="South">South</option>
+                        <option value="San Jose">San Jose</option>
+                    </select>
+                </div>
+            </div>
+            <div class="height0 gap10 colF1">
+                <div class="field gap5 height0">
+                    <label for="">Role*</label>
+                    <div class="selectBar">
+                        <select name="role" id="role" required>
+                            <option value="" selected disabled>Select</option>
+                            <option value="Head">Head</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Registrar">Registrar</option>
+                            <option value="Accounting">Accounting</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <%
+            const ASSIGN_OPTIONS = [
+            { code: "CAS", label: "CAS" },
+            { code: "CELA", label: "CELA" },
+            { code: "CMA", label: "CMA" },
+            { code: "COE", label: "COE" },
+            { code: "CIT", label: "CIT" },
+            { code: "CAHS", label: "CAHS" },
+            { code: "CCJE", label: "CCJE" },
+            { code: "OLD", label: "OLD" },
+            { code: "San Jose", label: "San Jose" },
+            { code: "South", label: "South" }
+            ];
+            %>
+
+            <div class="field gap5 height0">
+                <label for="">Assign*</label>
+                <div class="selectBar">
+                    <select name="assign" id="assign" required>
+                        <option value="" selected disabled>Select</option>
+                       <% ASSIGN_OPTIONS.forEach(opt => { %>
+                            <option value="<%= opt.code %>"><%= opt.label %></option>
+                        <% }) %>
+                    </select>
+                </div>
+            </div>
+            <br>
+            <section class="justifyBetween padding0">
+                <button type="reset" class="nav"><i class="fas fa-rotate"></i>Clear Form</button>
+                <button type="submit" class="nav pnav"><i class="fas fa-plus"></i>Create Account</button>
+            </section>
+        </section>
+    </form>
+</div>
+
+
+<section class="justifyBetween bgWhite corner20">
+    <p class="size36 str400 marginLeft10">Employee Accounts Management</p>
+    <a href="/empArc" class="nav"><i class="fas fa-archive"></i> Archive</a>
+</section>
+<br>
+
+<% if (!users || users.length === 0) { %>
+    <section class="height50 corner20 empCard paddingInline0 borderGray borderDotted marginBlock20 col">
+        <%- include('icons/notFound') %>
+        <p class="size20 str500">No Record Found!</p>
+    </section>
+<% } else { %>
+    
+    <p class="size20 str500 marginLeft10">Registrar</p>
+    <section class="bgWhite corner20 justifyStart wrap alignStart empCard paddingInline0">
+        <% users.forEach(user => { %>
+            <% if ( user.role === "Registrar") { %>
+            <a href="/empView/<%= user._id %>" class="height0 w120 col gap5">
+                <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.jpg';" class="h80 w80 corner500 shadow1">
+                <p class="size14 textWrap textCenter"><%= user.fName %> <i class="bi bi-patch-check-fill navy"></i></p>
+                <p class="size10 textWrap textCenter green"><i class="fas fa-suitcase"></i> <%= user.assign || 'Unknown' %></p>
+            </a>
+            <% } %>
+        <% }) %>
+            <div href="" class="height0 w120 col gap5">
+                <a href="javascript:void(0)" class="h80 w80 corner500 borderGray borderDotted empBtn"><i class="fas fa-plus size30 gray"></i></a>
+                <p class="size14 textWrap textCenter str500 opacity0"><%= user.fName %> <i class="bi bi-patch-check-fill navy"></i></p>
+                <p class="size10 textWrap textCenter green opacity0"><i class="fas fa-user-cog"></i> <%= user.role || 'Unknown' %></p>
+            </div>
+    </section>
+
+    <br>
+    <section class="padding0 gap20"> 
+        <section class="col alignStart padding0 width45">
+            <p class="size20 str500 marginLeft10">Admins</p>
+            <section class="bgWhite corner20 justifyStart wrap alignStart empCard paddingInline0">
+                <% users.forEach(user => { %>
+                    <% if ( user.role === "Head"  || user.role === "Admin") { %>
+                    <a href="/empView/<%= user._id %>" class="height0 w120 col gap5">
+                        <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.jpg';" class="h80 w80 corner500 shadow1">
+                        <p class="size14 textWrap textCenter str500"><%= user.fName %> <i class="bi bi-patch-check-fill navy"></i></p>
+                        <p class="size10 textWrap textCenter green"><i class="fas fa-user-cog"></i> <%= user.role || 'Unknown' %></p>
+                    </a>
+                    <% } %>
+                <% }) %>
+                    <div href="" class="height0 w120 col gap5">
+                        <a href="javascript:void(0)" class="h80 w80 corner500 borderGray borderDotted empBtn"><i class="fas fa-plus size30 gray"></i></a>
+                        <p class="size14 textWrap textCenter str500 opacity0"><%= user.fName %> <i class="bi bi-patch-check-fill navy"></i></p>
+                        <p class="size10 textWrap textCenter green opacity0"><i class="fas fa-user-cog"></i> <%= user.role || 'Unknown' %></p>
+                    </div>
+            </section>
+        </section>
+        <section class="col alignStart padding0 width55">
+            <p class="size20 str500 marginLeft10">Accounting</p>
+            <section class="bgWhite corner20 justifyStart wrap alignStart empCard paddingInline0">
+                <% users.forEach(user => { %>
+                    <% if ( user.role === "Accounting") { %>
+                    <a href="/empView/<%= user._id %>" class="height0 w120 col gap5">
+                        <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.jpg';" class="h80 w80 corner500 shadow1">
+                        <p class="size14 textWrap textCenter"><%= user.fName %> <i class="bi bi-patch-check-fill navy"></i></p>
+                        <p class="size10 textWrap textCenter green"><i class="fas fa-user-cog"></i> <%= user.role || 'Unknown' %></p>
+                    </a>
+                    <% } %>
+                <% }) %>
+                    <div href="" class="height0 w120 col gap5">
+                        <a href="javascript:void(0)" class="h80 w80 corner500 borderGray borderDotted empBtn"><i class="fas fa-plus size30 gray"></i></a>
+                        <p class="size14 textWrap textCenter str500 opacity0"><%= user.fName %> <i class="bi bi-patch-check-fill navy"></i></p>
+                        <p class="size10 textWrap textCenter green opacity0"><i class="fas fa-user-cog"></i> <%= user.role || 'Unknown' %></p>
+                    </div>
+            </section>
+        </section>
+    </section>   
+<% } %>
+
+<script>
+function toggleCards(show) {
+    document.querySelectorAll(".empCard2").forEach(card => {
+        card.classList.toggle("seen2", show);
+        card.classList.toggle("unseen2", !show);
+    });
+}
+
+document.querySelectorAll(".empBtn").forEach(btn => {
+    btn.addEventListener("click", () => toggleCards(true));
+});
+
+document.getElementById("empClose").addEventListener("click", () => toggleCards(false));
+
+</script>
+<script>
+    function enforceNumericInput(event) {
+        event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const phoneInputs = document.querySelectorAll('.number');
+        phoneInputs.forEach(input => {
+            input.addEventListener('input', enforceNumericInput);
+        });
+    });
+</script>

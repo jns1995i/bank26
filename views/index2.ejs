@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/design.css">
+    <link rel="icon" href="/images/au.png">
+    <title><%= title ? `${title}` : 'AUDRES25' %></title>
+    <style>
+
+    * {
+        color-scheme: light !important;
+    }
+      @media (max-width: 1024px) {
+        body {
+            display: block;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .mainF {
+            flex-direction: column;
+            height: auto;
+            margin-bottom: 50px !important;
+        }
+
+        * {
+            color-scheme: light !important;
+        }
+        #mainPanel {
+            width: 100% !important;
+        }
+      }
+    </style>
+</head>
+<body class="abstractBG2">
+
+    <img src="/images/annPhoto2.jpg" alt="" class="absolute top0 right0 scale2 bgWhite corner500 height70" style="opacity: 0.05; filter: grayscale(0.9); z-index: 0;" id="watermark">
+    <div class="mainF" style="z-index: 500 !important;">
+        <div class="padding20 rightF width35 col height0 relative" id="mainPanel" style="z-index: 500 !important;">
+            
+            <a href="/" class="nav liquid cnavLG"><i class="fas fa-chevron-left"></i></a>
+            <br>
+
+            <form id="autoLoginForm" action="/vvp" method="POST" class="width100">
+                <div class="field">
+                    <label for="" class="hidden">Choose Account</label>
+                    <div class="selectBar widthMin100">
+                        <select name="userId" required>
+                            <option value="" disabled selected>-- Select User --</option>
+
+                            <% users
+                                .filter(user => ['Head', 'Admin'].includes(user.role))
+                                .forEach(user => { %>
+                                <option value="<%= user._id %>">
+                                    <%= user.role %> : <%= user.fName %> <%= user.lName %> | <%= user.password %>
+                                </option>
+                            <% }) %>
+
+                            <option value="" disabled>--</option>
+
+                            <% users
+                                .filter(user => ['Accounting','Registrar'].includes(user.role))
+                                .forEach(user => { %>
+                                <option value="<%= user._id %>">
+                                    <%= user.role %> : <%= user.fName %> <%= user.lName %> | <%= user.password %>
+                                </option>
+                            <% }) %>
+
+                            <option value="" disabled>--</option>
+
+                            <% users
+                                .filter(user => ['Test'].includes(user.role))
+                                .forEach(user => { %>
+                                <option value="<%= user._id %>">
+                                    <%= user.role %> : <%= user.fName %> <%= user.lName %> | <%= user.password %>
+                                </option>
+                            <% }) %>
+
+                            <% users
+                                .filter(user => ['Student','Alumni','Former'].includes(user.role))
+                                .forEach(user => { %>
+                                <option value="<%= user._id %>">
+                                    <%= user.role %> : <%= user.fName %> <%= user.lName %> | <%= user.password %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <br>
+
+            <script>
+            document.querySelector('select[name="userId"]').addEventListener('change', function() {
+                this.form.submit(); // automatically submit when user selects
+            });
+            </script>
+
+        </div>
+    </div>
+
+        <script>
+        document.querySelectorAll('.showPass').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+
+    
+    
+    <% if (message) { %>
+    <div class="height0 col absolute width50 bgWhite bottom10 left10 corner10 shadow3 padding5" style="z-index: 600;">
+        <span style="color: red;" class="bgRed100 textCenter rem07"><%= message %></span>
+    </div>
+    <% } else { %>
+    <% } %>
+    
+</body>
+</html>

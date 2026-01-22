@@ -1,0 +1,287 @@
+<% layout('scale') %>
+<style>
+    .info p i {
+        width: 20px !important;
+        display: inline;
+        margin-right: 5px;
+    }
+    .info p {
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+ <section class="gap10 alignStart padding5" id="">
+                <% const routes = { trs: "/trs", toPay: "/toPay", ver: "/ver", dsb: "/dsb", trsAll: "/trsAll"};
+                const href = routes[back] || "/trs"; %>
+    <a href="<%= href %>" class="nav cnav marginTop5 porcelain"><i class="fas fa-chevron-left"></i></a>
+
+        <section class="col width60 padding5">
+            <section class="justifyBetween padding0 hidden">
+                <a href="<%= href %>" class="nav"><i class="fas fa-chevron-left"></i> Go Back</a>
+                <p class="size20 str400">Request Details</p>
+            </section>
+            
+            <section class="corner15 bgWhite col gap10 shadow1">
+            
+                <%- include('partials/srvCard') %>
+            
+                <section class="col padding15 corner15 bgSoft gap10">
+                    <% if (request.items && request.items.length > 0) { %>
+                        <% request.items.forEach(item => { %>
+                            <section class="gap10 alignStart justifyStart
+                            <% if ( item.status === "Approved") { %>
+                            bgWhite shadow1
+                            <% } else { %>
+                            porcelain 
+                            <% } %>
+                            corner15 padding15 relative">
+                                <section class="padding0 alignStart col">
+                                    <p class="rem14 str500 flex alignCenter">
+                                        <%= item.qty %> <%= item.type %>
+                                        <% if ( item.proof ) { %>
+                                        <% } %>
+                                    </p>
+                                    <p class="rem12 colorPrimary">
+                                        <span class="colorPrimary rem12">
+                                            <%= item.semester + ` Semester` %> <%= `• ` + item.schoolYear %> <i class="fas fa-angles-right"></i>
+                                        </span> &nbsp; 
+                                        For <%= item.purpose %>
+                                    </p>
+                                    <p class="rem12"></p>
+                                    <% if ( item.status === "Declined") { %>
+                                        <a href="" class="disabled nav cnavLG absolute translateY right10 bgRed100"><i class="fas fa-xmark-circle"></i></a>
+                                    <% } else if ( item.status === "Approved") { %>
+                                        <a href="" class="disabled nav cnavLG absolute translateY right10 bgBlue100"><i class="fas fa-check-circle"></i></a>
+                                    <% } else { %>
+                                    <% } %>
+                                <% if ( item.free !== true ) { %>
+                                <% } else { %>
+                                    <p class="bgGreen100 border0 size12">Free of Charge</p>
+                                <% } %>
+                                </section>
+                                <section class="padding5 gap5 width0 corner10 absolute top0 right0">
+                                
+                                </section>
+                            </section>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No items found for this request.</p>
+                    <% } %>
+                </section>
+            </section>
+        </section>
+
+        <section class="col alignStart width35 padding5 justifyStart corner15 gap10">
+            <%- include('partials/status') %>     
+            <%- include('partials/notes') %>
+
+            <% if ( request.status === "Reviewed") { %>
+                <section class="gap10 justifyBetween corner15 col bgWhite padding20 shadow1">
+                    <p class="rem14 str500 darkGray">Action Panel</p>
+                    <section class="padding0 gap10">
+                        <% if ( !request.holdAt) { %>
+                        <form action="/hold4" method="POST" class="form2 width100">
+                            <input type="hidden" name="requestId" value="<%= request._id %>">
+                            <input type="hidden" name="back" value="<%= back %>">
+                            <button type="submit" class="nav corner10 width100"><i class="fas fa-clock"></i> Hold Request</button>
+                        </form>
+                        <% } else { %>
+                        <% } %>
+                        <form action="/approve4" method="POST" class="form2 width100">
+                            <input type="hidden" name="requestId" value="<%= request._id %>">
+                            <input type="hidden" name="back" value="<%= back %>">
+                            <button type="submit" class="nav pnav corner10 width100"><i class="fas fa-check-circle"></i> Approve Request</button>
+                        </form>
+                    </section>
+                </section>
+            <% } %>
+
+            <% if ( request.status === "For Verification") { %>
+                <section class="gap10 justifyBetween corner15 col bgWhite padding20 shadow1">
+                    <p class="rem14 str500 darkGray">Action Panel</p>
+                    <section class="padding0 gap10">
+                        <% if ( !request.holdAt) { %>
+                        <form action="/hold5" method="POST" class="form2 width100">
+                            <input type="hidden" name="requestId" value="<%= request._id %>">
+                            <input type="hidden" name="back" value="<%= back %>">
+                            <button type="submit" class="nav corner10 width100"><i class="fas fa-rotate"></i> Reupload Proof</button>
+                        </form>
+                        <% } else { %>
+                        <% } %>
+                        <form action="/verify4" method="POST" class="form2 width100">
+                            <input type="hidden" name="requestId" value="<%= request._id %>">
+                            <input type="hidden" name="back" value="<%= back %>">
+                            <button type="submit" class="nav pnav corner10 width100"><i class="fas fa-check-circle"></i> Verify Payment</button>
+                        </form>
+                    </section>
+                </section>
+            <% } %>
+            
+            <% if ( request.status === "Assessed") { %>
+            <section class="gap10 justifyBetween corner20 bgWhite shadow1 col padding20 hidden">
+                <%- include('icons/success') %>
+                <p class="rem12 str500 textCenter green">Confirm that the document is fully prepared and ready for release.</p>
+                <form action="/fRel" method="POST" class="form2">
+                    <input type="hidden" name="requestId" value="<%= request._id %>">
+                    <input type="hidden" name="back" value="<%= back %>">
+                    <button type="submit" class="nav corner10 gnav"><i class="fas fa-dolly"></i>Ready For Release</button>
+                </form>
+            </section>
+            <% } %>
+
+            <style>
+                .claimX #successIcon {
+                    border: 0.5px solid blue !important;
+                    i.fa-thumbs-up {
+                        color: rgb(8, 8, 92);
+                    }
+                }
+            </style>
+
+            <% if (['Accounting'].includes(user.role)) { %>
+            <section class="col alignStart gap5">
+                <% if ( request.processBy) { %>
+                <section class="corner10 gap5 justifyStart width0 padding0">
+                    <img src="<%= request.processBy?.photo || '/images/profile.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.png';" class="h20 w20 wMin20 borderPrimary corner500">
+                    <p class="rem12 str500"> <%= request.processBy?.fName || "" %> <%= request.processBy?.lName || "" %></p>
+                </section>
+                <p class="rem1 str400 marginLeft5">Assigned at <%= request.assignAtFormatted %></p>
+                <% } else { %>
+                    <p class="red bgRed100"><i class="fas fa-exclamation-circle"></i> Unassigned</p>
+                <% } %>
+            </section>
+            <% } %>
+        </section>
+    </section>
+
+    
+<div class="bgSoft absolute top0 left0 hidden" id="noticeCard">
+    <section class="width35 padding30 corner20 bgWhite shadow1 col">
+        <%- include('icons/warning') %>
+            <p class="size30 str500">WARNING!</p>
+            <section class="col textCenter">
+                <p class="rem1" id="noticeMsg">Message here</p>
+            </section>
+            <div class="selectBar width100 widthMax100 marginBottom15" id="SelectDiv" style="display: none;">
+                <select name="" id="selectFlex">
+                    <option value="" selected disabled>Select Reason</option>
+                </select>
+            </div>
+            <section class="bgBlue100 col padding15 textCenter">
+                <p class="rem12">This action cannot be undone!</p>
+            </section>
+            <br>
+            <div class="section gap10">
+                <a href="javascript:vod(0)" class="nav width100"  id="closeNoticeCard"> Go Back</a>
+                <a href="javascript:vod(0)" class="nav pnav width100" id="proceedBtn"> Proceed</a>
+            </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const noticeCard = document.getElementById("noticeCard");
+    const noticeMsg = document.getElementById("noticeMsg");
+    const proceedBtn = document.getElementById("proceedBtn");
+    const closeNoticeCard = document.getElementById("closeNoticeCard");
+    const selectDiv = document.getElementById("SelectDiv");
+    const selectFlex = document.getElementById("selectFlex");
+
+    let currentForm = null; // form to submit
+    let currentAction = null; // store action type: 'item', 'decline3', 'hold3'
+
+    const reasonOptions = {
+        hold: ["Balance", "Payment", "Unclear Proof"],
+        decline: ["Payment", "Balance", "Illegible", "Unidentified"]
+    };
+
+    const actions = [
+        { selector: 'form[action="/hold4"] button', message: "Are you sure you want to hold this whole transaction? Select your reason below", reason: "hold", type: "transaction" },
+        { selector: 'form[action="/approve4"] button', message: "Are you sure this request passed the assessment? It will be marked as For Payment or will be marked as Verified if all the documents are free", type: "transaction" },
+
+        { selector: 'form[action="/hold5"] button', message: "Are you sure you want to proceed? This will hold the request and delete all the uploaded proof of payment. Please select your reason below", reason: "hold", type: "transaction" },
+        { selector: 'form[action="/verify4"] button', message: "Are you sure you want to proceed? This request and payment will be marked as Verified", type: "transaction" },
+    ];
+
+    function populateSelect(reasonType) {
+        selectFlex.innerHTML = "";
+        const defaultOption = new Option("Select Reason", "");
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        selectFlex.appendChild(defaultOption);
+
+        reasonOptions[reasonType].forEach(opt => {
+            selectFlex.appendChild(new Option(opt, opt));
+        });
+
+        selectFlex.required = true;
+        selectDiv.style.display = "flex";
+    }
+
+    actions.forEach(action => {
+        document.querySelectorAll(action.selector).forEach(btn => {
+            btn.addEventListener("click", e => {
+                e.preventDefault();
+                currentForm = btn.closest("form");
+                currentAction = action; // store the action type
+                noticeMsg.textContent = action.message;
+
+                if (action.reason && reasonOptions[action.reason]) {
+                    populateSelect(action.reason);
+                } else {
+                    selectDiv.style.display = "none";
+                    selectFlex.required = false;
+                }
+
+                noticeCard.classList.remove("hidden");
+            });
+        });
+    });
+
+    closeNoticeCard.addEventListener("click", () => {
+        noticeCard.classList.add("hidden");
+        currentForm = null;
+        currentAction = null;
+        selectDiv.style.display = "none";
+        selectFlex.required = false;
+        selectFlex.value = "";
+    });
+
+    proceedBtn.addEventListener("click", () => {
+        if (!currentForm) return;
+
+        // If select is visible, ensure a value is selected
+        if (selectDiv.style.display !== "none" && !selectFlex.checkValidity()) {
+            selectFlex.reportValidity();
+            return;
+        }
+
+        // Inject the reason into a hidden input before submitting
+        let reasonValue = selectFlex.value;
+        if (reasonValue) {
+            let inputName = "";
+
+            if (currentAction.type === "item") {
+                inputName = "itemRemarks"; // send as item.remarks in backend
+            } else if (currentAction.type === "transaction") {
+                inputName = "requestRemarks"; // send as request.remarks in backend
+            }
+
+            // Remove existing hidden input if any
+            let existingInput = currentForm.querySelector(`input[name="${inputName}"]`);
+            if (existingInput) existingInput.remove();
+
+            // Append new hidden input
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = inputName;
+            hiddenInput.value = reasonValue;
+            currentForm.appendChild(hiddenInput);
+        }
+
+        currentForm.submit();
+    });
+});
+</script>

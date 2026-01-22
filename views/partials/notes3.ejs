@@ -1,0 +1,280 @@
+ <% if ( rq.holdAt ) { %>
+                <section class=" bgWhite padding0 relative col">
+                    <section class="bgGray100 textCenter colorPrimary col corner20 padding10" style="min-height: 60px;">
+                        Your request has been hold! <%= rq.remarks %>
+                    </section>
+                </section>
+                <% } else if ( rq.declineAt ) { %>
+                <section class=" bgWhite padding0 relative col">
+                    <section class="bgYellow textCenter colorPrimary col corner20 padding10" style="min-height: 60px;">
+                        We regret to inform you that your request has been declined. For further assistance, please visit the Registrar’s Office on your campus, or contact us through our official hotline at <%= seedUser.phone %> or via email at <%= seedUser.email %>
+                        <% if ( rq.remarks === "Incomplete") { %>
+                        <% } else if ( rq.remarks === "Balance") { %>
+                        <% } else { %>
+                        <% } %>
+                    </section>
+                </section>
+                <% } else { %>
+                <section class="padding0 relative bgBlue100 corner20">
+                    <section class=" textCenter colorPrimary col padding20" id="noteX" style="min-height: 60px;">
+                        <% if (rq.status === "Pending") { %>
+                        <p class="">We have received your request, and the registrar is now reviewing it. We will notify you once it has been processed.</p>
+                        <% } else if (rq.status === "Reviewed") { %>
+                            <p class="">Good news! Your request has been reviewed and has now been forwarded to the Accounting Department for assessment.</p>
+                        <% } else if (rq.status === "Assessed") { %>
+                            <section class="bgWhite col corner15">
+                                <p>Your request is now ready <strong style="font-weight: 600; font-size: inherit;">FOR PAYMENT</strong>.</p>
+                                <p class="size16 str500">Pay the total amount of &#8369;<%= totalAmount || "0" %>.00</p>
+                            </section>
+                            <br>
+                            <p>You can pay it <span class="inline str600">ONLINE</span> at your convenience or pay at any cashier window if you are inside the school premises</p>
+                            <br>
+                            <p class="textBalance"><i class="fas fa-info-circle"></i> Take Note: You are required to upload your proof of payment below. So Please make sure to take a screenshot of the receipt from your online transaction or take a photo of your receipt from the cashier after payment</p>
+                            <p class="hidden">  For online payment instructions, click <a href="/ins2" target="_blank" class="navy inline width0 height0 str500 size14">here</a>. Please make sure to take a screenshot of the transaction receipt or take photo of the receipt from the cashier and upload it <a class="size14 str500 navy inline" href="https://bit.ly/OnlinePaymentGcashBanktransferECPAYPayMaya" target="_blank">here</a></p>
+                            <br>
+                           <form action="/paymentUpload" method="POST"  enctype="multipart/form-data" class="colorPrimary gap10">
+                                <input type="hidden" name="id" value="<%= rq ? rq._id : '' %>">
+                                <div class="field hidden">
+                                    <label for="">Payment Method</label>
+                                    <div class="selectBar">
+                                        <select name="payMode" id="payMode">
+                                            <option value="Online" selected>Select Method</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="GCash">GCash</option>
+                                            <option value="Maya">Maya</option>
+                                            <option value="Bank Deposit">Bank Deposit</option>
+                                            <option value="Bank Transfer">Bank Transfer</option>
+                                            <option value="Credit Card">Credit Card</option>
+                                            <option value="Debit Card">Debit Card</option>
+                                            <option value="Bayad Center">Bayad Center</option>
+                                            <option value="7-Eleven">7-Eleven (Cliqq/Bills Payment)</option>
+                                        </select>                            
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="">Upload your Proof of Payment here.</label>
+                                    <input name="payPhoto" type="file" multiple required>
+                                    <label for=""><i class="fas fa-info-circle inline"></i> Multiple file can be uploaded</label>
+                                </div>
+                                <p class="bgRed100 limitPhoto hidden marginTop10"></p>
+
+                                <div class="field alignEnd">
+                                    <button class="nav pnav w120">Upload</button>
+                                </div>
+                                <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    const input = document.querySelector('input[name="payPhoto"]');
+                                    const warning = document.querySelector('.limitPhoto');
+
+                                    const maxSize = 500 * 1024 * 1024; // 500MB
+
+                                    input.addEventListener('change', function () {
+                                        warning.classList.add("hidden");
+                                        warning.textContent = "";
+
+                                        if (!this.files || this.files.length === 0) return;
+
+                                        const file = this.files[0];
+
+                                        // ✅ Check if file is an image
+                                        if (!file.type.startsWith("image/")) {
+                                            warning.textContent = "Only photo files are allowed!";
+                                            warning.classList.remove("hidden");
+                                            this.value = ""; // clear uploaded file
+                                            return;
+                                        }
+
+                                        // ✅ Check file size
+                                        if (file.size > maxSize) {
+                                            warning.textContent = "Photo must not be larger than 500MB!";
+                                            warning.classList.remove("hidden");
+                                            this.value = ""; // clear uploaded file
+                                            return;
+                                        }
+                                    });
+                                });
+                                </script>
+                            </form>
+
+                        <% } else if (rq.status === "For Verification") { %>
+                            <p class="">Please wait while we are verifying your payment. Thank you</p>
+                        <% } else if (rq.status === "Verified") { %>
+                            <%- include('../icons/successBlue') %>
+                            <br>
+                            <p class="">Request has been approved! We will notify you via the email you provided once your document is ready for release.</p>
+                        <% } else if (rq.status === "For Release") { %>
+                            <div class="height0 col bgWhite padding20 corner15">
+                                <p><i class="fas fa-check-circle corner500" style="font-size: 12px; outline: 1px solid rgb(3, 18, 106, 0.2);"></i>
+                                Great News! You can now claim your document anytime at the School Registrar Office.
+                                </p>
+                                <br>
+                                <p class="textBalance porcelain">Present the QR Code below including the requirements needed</p>
+                                <br>
+                                <p>If someone will be claiming the document on your behalf, they must present a signed authorization letter along with original and 1 photocopy of any valid ID</p>
+                                <br>
+                                    
+                                <div class="bgWhite height0 gap5 justifyCenter alignCenter width0 padding5 corner10 darkShadow relative">
+                                    <div class="height0 col hidden">
+                                        <p class="size14">
+                                            <%= user.fName %> <%= user.mName %> <%= user.lName %> <%= user.xName %>
+                                        </p>
+                                        <p class="size14"><%= user.role %></p>
+                                        <p class="size14"><%= user.course %></p>
+                                        <p class="size14"><%= rq.tr %></p>
+                                        <p class="size14"><%= rq.requestAt %></p>
+                                    </div>
+                                    <canvas id="qrcodeCanvas" width="100" height="100" class="hMax150 wMax150"></canvas>
+                                    <a href="javascript:void(0)" class="nav cnav qrBtn absolute bottom5 right5 glass"><i class="fas fa-download"></i></a>
+                                </div>
+                            </div>
+                            <section class="bgWhite padding15 corner15 marginTop15 col">
+                                <% if (rq.rating) { %>
+                                    <p class="marginBottom10 textCenter textBalance">Thank you for your feedback!</p>
+                                <% } else { %>
+                                    <p class="marginBottom10 textCenter textBalance">We’d love your feedback! Take a moment to rate us.</p>
+                                <% } %>
+                                
+                                <form id="rateForm" class="height0 padding0 transparent">
+                                    <div class="height0 gap10">
+                                        <i class="fas fa-star gray rateStar rem2" data-value="1"></i>
+                                        <i class="fas fa-star gray rateStar rem2" data-value="2"></i>
+                                        <i class="fas fa-star gray rateStar rem2" data-value="3"></i>
+                                        <i class="fas fa-star gray rateStar rem2" data-value="4"></i>
+                                        <i class="fas fa-star gray rateStar rem2" data-value="5"></i>
+                                    </div>
+                                    <input type="hidden" name="rating" id="ratingValue">
+                                    <button type="submit" class="hidden">Submit</button>
+                                </form>
+
+                                <div id="rateMessage" class="bgGreen100 textCenter marginBlock15 hidden width0"></div>
+
+                                <script>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const stars = document.querySelectorAll('.rateStar');
+                                    const ratingInput = document.getElementById('ratingValue');
+                                    const rateMessage = document.getElementById('rateMessage');
+
+                                    const requestId = '<%= rq._id %>';
+                                    const currentRating = <%= rq.rating || 0 %>; // load existing rating
+
+                                    // Function to highlight stars based on a value
+                                    function highlightStars(value) {
+                                        stars.forEach(s => {
+                                            if (Number(s.dataset.value) <= value) {
+                                                s.classList.add('yellow');
+                                                s.classList.remove('gray');
+                                            } else {
+                                                s.classList.remove('yellow');
+                                                s.classList.add('gray');
+                                            }
+                                        });
+                                    }
+
+                                    // Initialize stars with current rating
+                                    highlightStars(currentRating);
+                                    ratingInput.value = currentRating;
+
+                                    // Handle star clicks
+                                    stars.forEach(star => {
+                                        star.addEventListener('click', () => {
+                                            const value = Number(star.dataset.value);
+                                            ratingInput.value = value;
+                                            highlightStars(value);
+
+                                            // Send rating to backend
+                                            fetch(`/rate2/${requestId}`, {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ rating: value })
+                                            })
+                                            .then(res => res.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    rateMessage.textContent = `You rate us with ${data.rating} stars!`;
+                                                    rateMessage.classList.remove('hidden');
+                                                } else {
+                                                    rateMessage.textContent = data.error || 'Failed to submit rating';
+                                                    rateMessage.classList.remove('hidden');
+                                                }
+                                            })
+                                            .catch(err => {
+                                                rateMessage.textContent = 'Error submitting rating. Please try again.';
+                                                rateMessage.classList.remove('hidden');
+                                            });
+                                        });
+                                    });
+
+                                    // Prevent fallback submit
+                                    const rateForm = document.getElementById('rateForm');
+                                    rateForm.addEventListener('submit', e => e.preventDefault());
+                                });
+                                </script>
+                            </section>
+                            
+                            <script>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const downloadBtn = document.querySelector('.qrBtn');
+                                    const canvasEl = document.getElementById('qrcodeCanvas');
+
+                                    if (!downloadBtn || !canvasEl) return;
+
+                                    downloadBtn.addEventListener('click', () => {
+                                        // Convert canvas to data URL first
+                                        const dataURL = canvasEl.toDataURL('image/png');
+
+                                        // Detect iPhone/iPad
+                                        const isIOS = /iP(hone|od|ad)/i.test(navigator.userAgent);
+
+                                        if (isIOS) {
+                                            // iOS does NOT support download attribute for data URLs
+                                            // Solution: open the image in a new tab
+                                            const tab = window.open();
+                                            tab.document.write(
+                                                `<img src="${dataURL}" style="width:100%;height:auto;" />`
+                                            );
+                                            return;
+                                        }
+
+                                        // Desktop + Android: force download
+                                        const link = document.createElement('a');
+                                        link.href = dataURL;
+                                        link.download = 'qrcode.png';
+
+                                        // Must be added to DOM for some mobile browsers
+                                        document.body.appendChild(link);
+
+                                        link.click();
+
+                                        document.body.removeChild(link);
+                                    });
+                                });
+                            </script>
+                            <script>
+                                // Format the data into a readable string indicating transaction verification
+                                const requestDataFormatted = `Transaction Verified! 
+                                Name: ${"<%= user.fName %>"} ${"<%= user.mName %>"} ${"<%= user.lName %>"} ${"<%= user.xName %>"},
+                                Role: ${"<%= user.role %>"},
+                                Course: ${"<%= user.course %>"},
+                                TR: ${"<%= rq.tr %>"}`;
+                            
+                                // Generate the QR code with formatted data
+                                const canvas = document.getElementById('qrcodeCanvas');
+                                QRCode.toCanvas(canvas, requestDataFormatted, function (error) {
+                                    if (error) {
+                                        console.error(error);
+                                    } else {
+                                        console.log('QR code generated successfully');
+                                    }
+                                });
+                            </script>
+                        <% } else if (rq.status === "Claimed") { %>
+                            <p class="">Your document has been claimed!</p>
+                        <% } else { %>
+                        <p class="">No Remarks</p>
+                        <% } %>
+                    </section>
+                </section>
+                <% } %>
+
+                

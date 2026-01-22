@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/style.css?v=1.0">
+    <link rel="icon" href="/images/au.png">
+    <title><%= title ? `${title} | AUDRES25` : 'AUDRES25' %></title>
+    <style>
+        body {
+            padding: 0 !important;
+        }
+        
+        body::-webkit-scrollbar { display: flex; }
+      @media (max-width: 900px) {
+          body {
+            display: block;
+            overflow-y: auto;
+            background: rgb(237, 237, 237);
+            color: var(--shade12);
+            padding: 10px !important;
+            margin-bottom: 50px !important;
+          }
+          body::-webkit-scrollbar { display: none; }
+          .navF {
+            width: 100%;
+            justify-content: space-between;
+            border-radius: 40px;
+            padding: 0;
+          }
+          #lgCard > div {
+            width: 80% !important;
+          }
+          .mainF {
+              overflow-y: auto !important;
+              width: 100% !important;
+              display: block;
+              gap: 0;
+              height: auto;
+              z-index: 10 !important;
+              margin-top: 10px;
+              margin-bottom: 50px !important;
+          }
+          .sub .ctrl {
+            flex-direction: column;
+          }
+          .sub .ctrl div {
+            width: 100%;
+          }
+          .card1, .card2 {
+            width: 100%;
+          }
+          .card2 {
+            margin-bottom: 50px;
+          }
+      }
+    </style>
+</head>
+<% if ( user.access === 0) { %>
+<body class="col relative gradient gap10">
+    
+    <div class="height10 liquidX navF padding10 shadow1">
+        <div class="height0 padding10 gap10 cleft justifyStart">
+                <img src="<%= seedUser.photo ? seedUser.photo : '/images/au.png' %>" alt="Profile" class="h60 w60 corner500 liquid shadow1">
+            </div>
+        <div class="height0 padding10 gap5 cright justifyEnd">
+            <a href="/prf" class=" h60 w60 corner500 liquid">
+                <img src="<%= user.photo ? user.photo : '/images/profile.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.png';" class="height90 width90" style="border: 0.2px solid rgba(255, 255, 255, 0.5);">
+            </a>
+        </div>
+    </div>
+    <div class="mainF overflow-y1 alignStart gap10 padding5 marginTop0">
+        <%- body %>
+    </div>
+
+
+<div class="absolute translateCenter gradient hidden padding0" id="lgCard">
+  <div class="bgWhite corner20 height0 width25 col padding20">
+    <%- include('icons/lg') %>
+    <br>
+    <p class="size18 textCenter str500 width100" style="text-wrap: balanced;">Are you sure you want <br> to Sign Out?</p>
+    <div class="height0 marginTop10 gap10">
+      <a href="javascript:void(0)" class="nav width100" id="lgClose"> Cancel</a>
+      <a href="/logout" class="nav pnav width100"> Sign Out</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const lgOpen = document.getElementById('lgOpen');
+  const lgClose = document.getElementById('lgClose');
+  const lgCard = document.getElementById('lgCard');
+
+  // Open the logout modal
+  lgOpen.addEventListener('click', () => {
+    lgCard.classList.remove('hidden');
+  });
+
+  // Close the logout modal
+  lgClose.addEventListener('click', () => {
+    lgCard.classList.add('hidden');
+  });
+
+  // Optional: close modal when clicking outside
+  lgCard.addEventListener('click', (e) => {
+    if (e.target === lgCard) {
+      lgCard.classList.add('hidden');
+    }
+  });
+});
+</script>
+
+    <script>
+        document.querySelectorAll('.showPass').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+
+
+</body>
+<% } else { %>
+<body class="padding0 abstractBG" id="body2">
+  <div class="">
+    <div class="width30 bgWhite height0 cornerRem14 padding20 col colorPrimary unau">
+      <%- include('icons/warning') %>
+      <p class="rem3 str500">Unauthorized Access</p>
+      <p class="rem15 str400">Do not access this page!</p>
+      <br>
+      <a href="javascript:history.back()" class="nav"><i class="fas fa-chevron-left"></i>Go Back</a>
+    </div>
+  </div>
+</body>
+<% } %>
+</html>

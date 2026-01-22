@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/logo.png">
+    <title><%= title ? `${title}` : 'AUDRES25' %></title>
+    <style>
+  body {
+    overflow-y: auto !important;
+    display: block !important;
+    padding: 5px;
+  }
+  .mainF {
+    height: auto !important;
+  }
+  .leftF {
+    align-self: start !important;
+    justify-content: start !important;
+  }
+  #headF {
+    align-items: start;
+    position: initial !important;
+    top: initial !important;
+    left: initial !important;
+    transform: none !important;
+  }
+    .gemF {
+        height: 100px !important;
+        margin-top: 0 !important;
+    }
+    .iconix {
+        height: 100px;
+        width: 100px;
+        padding: 10px;
+        img {
+            height: 100% !important;
+        }
+    }
+    .rem48 {
+        font-size: 3rem;
+    }
+    .rem48.p2 {
+        margin-top: -2rem !important;
+    }
+    .rem48.p1 {
+        margin-top: 0 !important;
+    }
+  .logoF {
+      height: 60px;
+      width: 60px;
+      position: absolute;
+      top: 30% !important;
+      left: 53% !important;
+  }
+  img.logo {
+      height: 70%;
+  }
+    body::-webkit-scrollbar { display: initial; }
+      @media (max-width: 1024px) {
+        body {
+            display: block;
+            overflow-y: auto;
+            height: 100vh;
+            padding: 0 !important;
+        }
+        body::-webkit-scrollbar { display: none; }
+        .mainF {
+            flex-direction: column;
+            height: auto;
+            margin-bottom: 50px !important;
+            padding: 0 !important;
+        }
+        .leftF {
+          height: auto !important;
+            width: 100%;
+            padding: 0 !important;
+        }
+        .gemF {
+          height: auto !important;
+            margin-top: 0 !important;
+            img {
+                height: 70px;
+            }
+        }
+        .logoF {
+            height: 30px;
+            width: 30px;
+            position: absolute;
+            top: 35% !important;
+            left: 53% !important;
+        }
+        img.logo {
+            height: 70%;
+        }
+        .rem48 {
+            font-size: 3rem;
+        }
+        .rem48.p2 {
+            margin-top: -2rem !important;
+        }
+        .rem48.p1 {
+            margin-top: -1.6rem !important;
+        }
+        .rightF {
+            height: fit-content;
+            width: 100%;
+            padding: 0 !important;
+            margin-bottom: 100px !important;
+        }
+        .ehem {
+            border-radius: 0 !important;
+        }
+        #headF {
+            flex-direction: column !important;
+        }
+        .crd {
+          display: none !important;
+        }
+         .colF1 {
+          flex-direction: column !important;
+          .field {
+            width: 100%;
+          }
+         }
+         .sbBtn {
+            text-align: center;
+            justify-content: center;
+         }
+         #watermark {
+            transform: scale(1) !important;
+         }
+         
+        .gradientText {
+        background: linear-gradient(to bottom,white,  white, var(--tint8));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.2),
+            0 0 8px rgba(61, 77, 255, 0.3),
+            0 0 10px rgba(255, 255, 255, 0.2);
+            color-scheme: light !important;
+            -webkit-print-color-adjust: exact; /* prevent color alterations */
+            -webkit-text-fill-color: initial; /* reset text fill */
+            print-color-adjust: exact;    
+        }
+      }
+    </style>
+</head>
+<body class="bgWhite padding0">
+  
+
+    <div class="mainF relative" style="z-index: 500 !important;">
+        <div class="height0 padding20 col justifyStart relative leftF width40">
+
+            <section class="col padding0 abstractBG corner10 ehem">
+                <img src="/images/au.png" alt="" class="absolute top0 right0 scale2 bgWhite corner500" style="opacity: 0.05; filter: grayscale(0.9); z-index: 0;" id="watermark">
+                <div class="height0 col absolute translateCenter" id="headF">
+                    <div class="padding10 gemF relative">
+                        <div class="corner500 liquid w300 h300 iconix padding30">
+                            <img src="/images/au.png" alt="" class="corner500 h200 bgWhite">
+                        </div>
+                    </div>
+                    <p class="rem48 textWrap textCenter glowImg3 p1">AU Registrar Document</p>
+                    <p class="rem48 textWrap textCenter glowImg3 p2" style="margin-top: -3.6rem;">Request System</p>
+                </div>
+                <div class="height0 gap10 marginBottom20 hidden" id="rateF">
+                    <div class="height0 width0">
+                        <p>Average Rating: <%= ratings.averageRating.toFixed(1) %> ⭐ &nbsp; | &nbsp; <%= ratings.totalRatings %> votes</p>
+                    </div>
+                </div>
+            
+            <div class="height0 paddingInline10 paddingBlock10 justifyStart"><a href="/" class="nav liquid"><i class="fas fa-chevron-left"></i> Go Back to Login</a></div>
+            </section>
+
+        </div>
+        
+        <div class="padding20 rightF width45 col height0 relative" style="z-index: 100 !important;">
+            <form id="myForm" action="/reqDirect" method="POST" enctype="multipart/form-data" class="shadow1 padding30 card alignCenter relative colorPrimary ehem" style="z-index: 100;">
+                
+                <section class="col padding0 page" id="page1">
+                    <div class="bgWhite index50 col justifyStart height0 colorPrimary" id="">
+                        <div class="height0 col justifyCenter alignStart padding20 relative">
+                            <p class="size20 str500 marginBottom10">Data Privacy Notice</p>
+                            <p class="size14 str400 textJustify">
+                                By submitting this form, you agree to provide your personal details and valid ID for identity verification purposes only. All information collected will be treated as confidential and will be used solely for processing your document request. In compliance with the Data Privacy Act of 2012, your data will be securely stored and accessed only by authorized personnel from the Registrar’s Office. Your information will not be shared with third parties and will be retained only as necessary.
+                            </p>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="height0 row marginBlock15">
+                        <p class="size12 flex textCenter"><input type="checkbox" class="width0 marginRight10" id="agree" required> I have read and understood the DATA PRIVACY NOTICE</p>
+                    </div>
+                </section>
+                
+
+                <div class="col height0 alignStart gap5" id="editCard">
+
+                    <section class="col alignStart gap5 hidden page padding0 hidden" id="page2">
+                        
+
+                        <div class="field">
+                            <p class="rem18 str500 textCenter textBalance">Please select the document(s) you wish to request. Multiple document requests are allowed.</p>
+                        </div>
+
+                        <div class="fieldsetsContainer col height0 padding0 width100" id="fieldsetsContainer">
+                            <fieldset class="marginBottom10">
+                                <div class="height0 justifyEnd hidden" id="removeDocCard"><a href="javascript:void(0)" class="nav dnav" id="removeDoc">Remove</a></div>
+                                <div class="row gap10  colF1">
+                                    <div class="field">
+                                        <Label>Document Type</Label>
+                                        <div class="selectBar">
+                                            <select class="document-type" name="type[]" onchange="handleDocumentTypeChange(this)" required>
+                                                <option value="">Select</option>
+                                                <% documents.forEach(doc => { %>
+                                                    <option value="<%= doc.type %>"><%= doc.type %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label>No. Copies (Max. 3)</label>
+                                        <input name="qty[]" type="number" id="number" class="cpy" required>
+                                    </div>
+                                </div>
+                                <div class="row gap10 marginTop10">
+                                    <div class="field additional-options">
+                                        <label>Purpose</label>
+                                        <div class="selectBar">
+                                            <select class="document-options" name="purpose[]" onchange="handleOptionChange(this)" required>
+                                                <option value="" selected disabled>--Select Purpose</option>
+                                                <option value="Reference">Reference</option>
+                                                <option value="Requirement for Other School">Requirement for Other School</option>
+                                                <option value="Board Exam">Board Exam</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field upload hidden marginTop10">
+                                    <label class="str500">Please upload photo of School Request*</label>
+                                    <input type="file" name="reqPhoto[]" class="bgYellow">
+                                </div>
+
+                                <p class="bgRed100 limitPhoto hidden marginTop10"></p>
+                                <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    const input = document.querySelector('input[name="reqPhoto[]"]');
+                                    const warning = document.querySelector('.limitPhoto');
+
+                                    const maxSize = 500 * 1024 * 1024; // 500MB
+
+                                    input.addEventListener('change', function () {
+                                        warning.classList.add("hidden");
+                                        warning.textContent = "";
+
+                                        if (!this.files || this.files.length === 0) return;
+
+                                        const file = this.files[0];
+
+                                        // ✅ Check if file is an image
+                                        if (!file.type.startsWith("image/")) {
+                                            warning.textContent = "Only photo files are allowed!";
+                                            warning.classList.remove("hidden");
+                                            this.value = ""; // clear uploaded file
+                                            return;
+                                        }
+
+                                        // ✅ Check file size
+                                        if (file.size > maxSize) {
+                                            warning.textContent = "Photo must not be larger than 500MB!";
+                                            warning.classList.remove("hidden");
+                                            this.value = ""; // clear uploaded file
+                                            return;
+                                        }
+                                    });
+                                });
+                                </script>
+                                <br>
+                                <label class="rem1 marginBottom5 hidden">If applicable:</label>
+                                <div class="row gap10  colF1">
+                                    <div class="field">
+                                        <label for="">School Year</label>
+                                        <div class="selectBar">
+                                            <select name="schoolYear[]" id="schoolYear">
+                                                <option value="" selected disabled>Select</option>
+                                                <% for (let year = 2025; year >= 1990; year--) { %>
+                                                    <option value="<%= year %>-<%= year + 1 %>">
+                                                        <%= year %>-<%= year + 1 %>
+                                                    </option>
+                                                <% } %>
+                                            </select>                                
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label for="">Semester</label>
+                                        <div class="selectBar">
+                                            <select name="semester[]" id="">
+                                                <option value="First">First</option>
+                                                <option value="Second">Second</option>
+                                                <option value="Summer">Summer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <span class="totalAmount marginTop10"></span>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <p class="height0 bgBlue100 hidden textCenter" id="warning1"><i class="fas fa-exclamation-circle"></i> Please fill out all the required fields before adding a new one!</p>
+                        <div class="height0 bgSoft darkGray corner10 padding10 textCenter str500 width100 justifyCenter alignCenter hidden"><i class="fas fa-info-circle marginRight5"></i> Dismissal Form &nbsp; <a href="/docs/df.pdf" target="_blank" class="underline colorPrimary str500 width0 padding0 margin0 size12" id="df" download>Download Here</a></div>
+                        <div class="height0 justifyBetween padding5">
+                            <p class=" str500">Need Another Document?</p>
+                            <a href="javascript:void(0)" class="nav pnav" id="addDoc"><i class="fas fa-plus"></i> Additional</a>
+                        </div>
+                        <div class="height0 bgBlue100 textCenter"> Your total payable amount is &nbsp; <span id="grandTotal"> ₱0.00</span></div>
+                    </section>
+
+                    <section class="col alignStart gap5 page padding0 hidden" id="page3">
+
+                        <div class="field">
+                            <p class="rem18 str500">Please provide your personal information below</p>
+                        </div>
+                            
+                        <div class="row height0 width100 gap10 colF1">
+                            <div class="field gap5">
+                                <label for="">First Name*</label>
+                                <input type="text" name="firstName" class="sname" placeholder="Enter your first name" required>
+                            </div>
+                            <div class="field gap5">
+                                <label for="">Middle Name</label>
+                                <input type="text" name="middleName" class="sname" placeholder="Enter your middle name">
+                            </div>
+                        </div>
+                        <div class="row height0 width100 gap10 colF1">
+                            <div class="field gap5">
+                                <label for="">Last Name*</label>
+                                <input type="text" name="lastName" class="sname" placeholder="Enter your last name" required>
+                            </div>
+                            <div class="field gap5">
+                                <label for="">Extension Name <span class="gray size10">Optional</span></label>
+                                <input type="text" name="extName" class="sname" placeholder="e.g. Jr. I, II, III, Sr.">
+                            </div>
+                        </div>
+                        <script>
+                            function enforceNameFormat(event) {
+                                // Allow only letters and dash
+                                event.target.value = event.target.value.replace(/[^A-Za-z-.\s]/g, '');
+                            }
+
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const nameInputs = document.querySelectorAll('.sname');
+                                nameInputs.forEach(input => {
+                                    input.addEventListener('input', enforceNameFormat);
+                                });
+                            });
+                        </script>
+
+                        <div class="row height0 width100 gap10 colF1">
+                            <div class="field gap5">
+                                <label for="">Address*</label>
+                                <input type="text" name="address" placeholder="e.g. Barangay 1, Cabanatuan City, Nueva Ecija" required>
+                            </div>
+                        </div>
+                        <div class="row height0 width100 gap10 colF1">
+                            <div class="field col alignStart gap5">
+                                <label for="birthday">Birthday*</label>
+                                <div class="height0 gap5">
+                                    <div class="selectBar">
+                                        <select id="bMonth" name="bMonth" required>
+                                            <option value="">Month</option>
+                                        </select>
+                                    </div>
+                                    <div class="selectBar">
+                                        <select id="bDay" name="bDay" required>
+                                            <option value="">Day</option>
+                                        </select>
+                                    </div>
+                                    <div class="selectBar">
+                                        <select id="bYear" name="bYear" required>
+                                            <option value="">Year</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="height0 width100 gap10 alignEnd colF1">
+                            <div class="field gap5">
+                                <label for="">Active PHINMA AU or Personal Email*</label>
+                                <input type="email" name="email" id="em" placeholder="" required>
+                            </div>
+                            <div class="field gap5">
+                                <label for="">Phone Number*</label>
+                                <input type="text" id="number" name="number" inputmode="numeric" required class="number">
+                            </div>
+                            <script>
+                                document.getElementById('em').addEventListener('input', function () {
+                                    const email = this.value;
+                                
+                                    fetch(`/check-email?email=${encodeURIComponent(email)}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const errorMsg = document.getElementById('error');
+                                            if (data.exists) {
+                                                errorMsg.classList.remove('hidden');
+                                            } else {
+                                                errorMsg.classList.add('hidden');
+                                            }
+                                        });
+                                });
+                            </script>
+                        </div>
+                        
+                        <div class="bgRed100 hidden width0" id="error">Email is already used by an existing account!</div>
+
+                        <br><hr><br>
+                        <div class="row height0 gap10 colF1">
+                            <div class="field gap5 height0">
+                                <label for="">Type of Student*</label>
+                                <div class="selectBar">
+                                    <select name="role" id="role" required>
+                                        <option value="" selected disabled>Select</option>
+                                        <option value="Student">Current Student</option>
+                                        <option value="Alumni">Alumni</option>
+                                        <option value="Former">Former Students or Transferred to other School</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field gap5">
+                                <label for="">Campus*</label>
+                                <div class="selectBar">
+                                    <select name="campus" id="campus" required>
+                                        <option value="" selected disabled>Select</option>
+                                        <option value="Main">Main</option>
+                                        <option value="South">South</option>
+                                        <option value="San Jose">San Jose</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="height0 gap10 colF1">
+                            <div class="field gap5">
+                                <div class="height0 justifyBetween">
+                                    <label for="sn" id="snLabel">Student Number <span class="hidden">(Optional)</span></label>
+                                </div>
+                                <input type="text" id="sn" name="studentNo" placeholder="e.g. 01-1920-032235">
+                            </div>
+                            <script>
+                                function enforceStudentNumberFormat(event) {
+                                    // Allow only digits and dash
+                                    event.target.value = event.target.value.replace(/[^0-9-]/g, '');
+                                }
+
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const snInput = document.querySelector('#sn');
+                                    snInput.addEventListener('input', enforceStudentNumberFormat);
+                                });
+                            </script>
+                            
+                            <script>
+                                function enforceYearNumberFormat(event) {
+                                    // Allow only digits and dash
+                                    event.target.value = event.target.value.replace(/[^0-9-]/g, '');
+                                }
+
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const snInput = document.querySelector('#yearGraduate');
+                                    snInput.addEventListener('input', enforceYearNumberFormat);
+                                });
+                            </script>
+                            
+                            <script>
+                                function enforceYearNumber2Format(event) {
+                                    // Allow only digits and dash
+                                    event.target.value = event.target.value.replace(/[^0-9-]/g, '');
+                                }
+
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const snInput = document.querySelector('#yearAttended');
+                                    snInput.addEventListener('input', enforceYearNumber2Format);
+                                });
+                            </script>
+                            <script>
+                            const roleSelect = document.getElementById('role');
+                            const snInput = document.getElementById('sn');
+                            const snLabel = document.getElementById('snLabel');
+                            const optionalSpan = snLabel.querySelector('span');
+
+                            roleSelect.addEventListener('change', () => {
+                                const selected = roleSelect.value;
+
+                                if (selected === 'Student') {
+                                    snInput.required = true;
+                                    optionalSpan.classList.add('hidden');
+                                } else {
+                                    snInput.required = false;
+                                    optionalSpan.classList.remove('hidden');
+                                }
+                            });
+                            </script>
+                            <script>
+                                document.getElementById('sn').addEventListener('input', function () {
+                                    const studentNo = this.value;
+                                
+                                    fetch(`/check-studentNo?studentNo=${encodeURIComponent(studentNo)}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            const errorMsg = document.getElementById('error2');
+                                            if (data.exists) {
+                                                errorMsg.classList.remove('hidden');
+                                            } else {
+                                                errorMsg.classList.add('hidden');
+                                            }
+                                        });
+                                });
+                            </script>
+                            <script>
+                                document.getElementById("role").addEventListener("change", function() {
+                                    const role = this.value;
+                                    const yearLevelField = document.getElementById("yearLevelField");
+                                    const yearLevelSelect = document.getElementById("yearLevel");
+
+                                    // Clear previous options
+                                    yearLevelSelect.innerHTML = "";
+
+                                    if (role === "Alumni") {
+                                        // Show only Graduated
+                                        const option = document.createElement("option");
+                                        option.value = "Graduated";
+                                        option.textContent = "Graduated";
+                                        option.selected = true;
+                                        yearLevelSelect.appendChild(option);
+                                        yearLevelField.classList.remove("hidden");
+                                    } else if (role === "Student" || role === "Former") {
+                                        const options = [
+                                            "1st Year","2nd Year","3rd Year","4th Year",
+                                            "Grade 11","Grade 12","Year 1 (Grad School)","Year 2 (Grad School)","Year 3 (Grad School)"
+                                        ];
+
+                                        const defaultOption = document.createElement("option");
+                                        defaultOption.value = "";
+                                        defaultOption.textContent = "Select";
+                                        defaultOption.disabled = true;
+                                        defaultOption.selected = true;
+                                        yearLevelSelect.appendChild(defaultOption);
+
+                                        options.forEach(opt => {
+                                            const option = document.createElement("option");
+                                            option.value = opt;
+                                            option.textContent = opt;
+                                            yearLevelSelect.appendChild(option);
+                                        });
+
+                                        yearLevelField.classList.remove("hidden");
+                                    } else {
+                                        yearLevelField.classList.add("hidden");
+                                    }
+                                });
+
+                                // ⭐ Run once on page load to set default correctly
+                                document.getElementById("role").dispatchEvent(new Event("change"));
+                            </script>
+                            <script>
+                            const roleSelect2 = document.getElementById("role");
+
+                            const yearGraduateContainer = document.getElementById("yearGraduateContainer");
+                            const yearGraduateInput = document.getElementById("yearGraduate");
+
+                            const yearAttendedContainer = document.getElementById("yearAttendedContainer");
+                            const yearAttendedInput = document.getElementById("yearAttended");
+
+                            function updateYearFields() {
+                                const role = roleSelect2.value;
+
+                                // reset
+                                yearGraduateContainer.classList.add("hidden");
+                                yearAttendedContainer.classList.add("hidden");
+
+                                yearGraduateInput.required = false;
+                                yearAttendedInput.required = false;
+
+                                if (role === "Alumni") {
+                                    yearGraduateContainer.classList.remove("hidden");
+                                    yearGraduateInput.required = true;
+                                }
+
+                                if (role === "Former") {
+                                    yearAttendedContainer.classList.remove("hidden");
+                                    yearAttendedInput.required = true;
+                                }
+                            }
+
+                            roleSelect2.addEventListener("change", updateYearFields);
+                            updateYearFields(); // run on load
+                            </script>
+
+                            <div class="field height0 col alignStart gap5 hidden" id="yearGraduateContainer">
+                                <label for="yearGraduate">Year Graduated</label>
+                                <input type="text" id="yearGraduate" name="yearGraduated">
+                            </div>
+                            <div class="field height0 col alignStart gap5 hidden" id="yearAttendedContainer">
+                                <label for="yearAttended">Year Last Attended</label>
+                                <input type="text" id="yearAttended" name="yearAttended">
+                            </div>
+                        </div>
+                        
+                        <div class="bgRed100 width0 hidden" id="error2">Student number is already registered!</div>
+                        <div class="row height0 gap10 colF1">
+                            <div class="field height0 col alignStart gap5 hidden" id="yearLevelField">
+                                <label for="yearLevel">Year Level</label>
+                                <div class="selectBar">
+                                    <select name="yearLevel" id="yearLevel">
+                                        <option value="" selected disabled>Select</option>
+                                        <option value="1st Year">1st Year</option>
+                                        <option value="2nd Year">2nd Year</option>
+                                        <option value="3rd Year">3rd Year</option>
+                                        <option value="4th Year">Fourth Year</option>
+                                        <option value="Grade 11">Grade 11</option>
+                                        <option value="Grade 12">Grade 12</option>
+                                        <option value="Year 1 (Grad School)"> Year 1 (Grad School)</option>
+                                        <option value="Year 2 (Grad School)"> Year 2 (Grad School)</option>
+                                        <option value="Year 3 (Grad School)"> Year 3 (Grad School)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row height0 width100 gap10 colF1">
+                            <div class="field gap5">
+                                <label for="">Course or Strand*</label>
+                                <div class="selectBar">
+                                    <select name="course" required>
+                                        <option value="" selected disabled>Select</option>
+                                        <option value="Bachelor of Arts in Political Science">Bachelor of Arts in Political Science</option>
+                                        <option value="Bachelor of Early Childhood Education">Bachelor of Early Childhood Education</option>
+                                        <option value="Bachelor of Elementary Education">Bachelor of Elementary Education</option>
+                                        <option value="Bachelor of Science in Accountancy">Bachelor of Science in Accountancy</option>
+                                        <option value="Bachelor of Science in Accounting Information System">Bachelor of Science in Accounting Information System</option>
+                                        <option value="Bachelor of Science in Business Administration - Banking and Microfinance">Bachelor of Science in Business Administration - Banking and Microfinance</option>
+                                        <option value="Bachelor of Science in Business Administration - Financial Management">Bachelor of Science in Business Administration - Financial Management</option>
+                                        <option value="Bachelor of Science in Business Administration - Human Resource Management">Bachelor of Science in Business Administration - Human Resource Management</option>
+                                        <option value="Bachelor of Science in Business Administration - Marketing Management">Bachelor of Science in Business Administration - Marketing Management</option>
+                                        <option value="Bachelor of Science in Civil Engineering">Bachelor of Science in Civil Engineering</option>
+                                        <option value="Bachelor of Science in Criminology">Bachelor of Science in Criminology</option>
+                                        <option value="Bachelor of Science in Electrical Engineering">Bachelor of Science in Electrical Engineering</option>
+                                        <option value="Bachelor of Science in Entrepreneurship">Bachelor of Science in Entrepreneurship</option>
+                                        <option value="Bachelor of Science in Hospitality Management">Bachelor of Science in Hospitality Management</option>
+                                        <option value="Bachelor of Science in Information Technology">Bachelor of Science in Information Technology</option>
+                                        <option value="Bachelor of Science in Management Accounting">Bachelor of Science in Management Accounting</option>
+                                        <option value="Bachelor of Science in Medical Laboratory Science">Bachelor of Science in Medical Laboratory Science</option>
+                                        <option value="Bachelor of Science in Nursing">Bachelor of Science in Nursing</option>
+                                        <option value="Bachelor of Science in Pharmacy">Bachelor of Science in Pharmacy</option>
+                                        <option value="Bachelor of Science in Psychology">Bachelor of Science in Psychology</option>
+                                        <option value="Bachelor of Secondary Education - English">Bachelor of Secondary Education - English</option>
+                                        <option value="Bachelor of Secondary Education - Filipino">Bachelor of Secondary Education - Filipino</option>
+                                        <option value="Bachelor of Secondary Education - Mathematics">Bachelor of Secondary Education - Mathematics</option>
+                                        <option value="Bachelor of Secondary Education - Science">Bachelor of Secondary Education - Science</option>
+                                        <option value="Doctor of Philosophy major in Educational Management">Doctor of Philosophy major in Educational Management</option>
+                                        <option value="Doctor of Philosophy major in Filipino">Doctor of Philosophy major in Filipino</option>
+                                        <option value="Doctor of Philosophy major in Psychology and Guidance">Doctor of Philosophy major in Psychology and Guidance</option>
+                                        <option value="Doctor of Philosophy major in Science Education">Doctor of Philosophy major in Science Education</option>
+                                        <option value="Master of Arts Major in Educational Management (Thesis & Non-Thesis)">Master of Arts Major in Educational Management (Thesis & Non-Thesis)</option>
+                                        <option value="Master of Arts Major in English (Thesis & Non-Thesis)">Master of Arts Major in English (Thesis & Non-Thesis)</option>
+                                        <option value="Master of Arts Major in Guidance and Counseling (Thesis & Non-Thesis)">Master of Arts Major in Guidance and Counseling (Thesis & Non-Thesis)</option>
+                                        <option value="Master of Arts Major in Mathematics (Thesis & Non-Thesis)">Master of Arts Major in Mathematics (Thesis & Non-Thesis)</option>
+                                        <option value="Master of Arts Major in Physical Education (Thesis & Non-Thesis)">Master of Arts Major in Physical Education (Thesis & Non-Thesis)</option>
+                                        <option value="Master of Arts Major in Psychology (Thesis & Non-Thesis)">Master of Arts Major in Psychology (Thesis & Non-Thesis)</option>
+                                        <option value="Master of Arts Major in Public Management">Master of Arts Major in Public Management</option>
+                                        <option value="Master of Arts Major in Science Education">Master of Arts Major in Science Education</option>
+                                        <option value="Master of Science in Business Administration major in Management">Master of Science in Business Administration major in Management</option>
+                                        <option value="ABM Specializes in Hospitality and Tourism">ABM Specializes in Hospitality and Tourism</option>
+                                        <option value="GAS - Criminology">GAS - Criminology</option>
+                                        <option value="GAS - Education">GAS - Education</option>
+                                        <option value="GAS - Information Technology">GAS - Information Technology</option>
+                                        <option value="HUMSS">HUMSS</option>
+                                        <option value="STEM">STEM</option>
+                                        <option value="STEM Health (Nursing, Pharmacy, Medical Laboratory Science, Psychology)">STEM Health (Nursing, Pharmacy, Medical Laboratory Science, Psychology)</option>
+                                    </select>                        
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field height0 col alignStart gap5 hidden" id="workField">
+                            <label for="work">Work or Career</label>
+                            <div class="selectBar">
+                                <select name="work" id="work">
+                                    <option value="" selected disabled>Select</option>
+                                    <option value="DEPED">DEPED</option>
+                                    <option value="Entrepreneur">Entrepreneur</option>
+                                    <option value="Government Employee">Government Employee</option>
+                                    <option value="Military Personnel">Military Personnel</option>
+                                    <option value="OFW">OFW</option>
+                                    <option value="Private Employee">Private Employee</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Unemployed">Unemployed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br>    
+                        <div class="bgYellow cornerRem1 padding20 textCenter">
+                            TAKE NOTE: Please review all the details carefully before submitting your request. Ensure that all selections and information are correct, as changes may not be allowed after submission.
+                        </div>
+                    </section>
+ 
+                <section class="justifyBetween">
+                    <a href="javascript:void(0)" class="nav bgTint4 white hidden" id="backNav"><i class="fas fa-chevron-left"></i> Back &nbsp;</a>
+                    <a href="javascript:void(0)" class="nav bgTint4 white" id="nextNav">&nbsp; Next <i class="fas fa-chevron-right"></i></a>
+                    <button type="submit" class="nav bgTint4 white sbBtn hidden" id="ferry"><i class="fas fa-check-circle"></i>Submit</button>
+                </section>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const pages = [
+            document.getElementById('page1'),
+            document.getElementById('page2'),
+            document.getElementById('page3')
+            ];
+
+            const backNav = document.getElementById('backNav');
+            const nextNav = document.getElementById('nextNav');
+            const ferry = document.getElementById('ferry');
+            const agreeCheckbox = document.getElementById('agree');
+
+            let currentPage = 0;
+
+            // ==========================
+            // Helpers
+            // ==========================
+            function showPage(index) {
+            pages.forEach((p, i) =>
+                p.classList.toggle('hidden', i !== index)
+            );
+
+            // Back button
+            backNav.classList.toggle('hidden', index === 0);
+
+            // Next button hides on page3
+            nextNav.classList.toggle('hidden', index === pages.length - 1);
+
+            
+            ferry.classList.toggle('hidden', index !== pages.length - 1);
+
+            currentPage = index;
+            }
+
+            function pageHasInvalidFields(page) {
+            const requiredFields = page.querySelectorAll('[required]');
+            return [...requiredFields].some(field => !field.checkValidity());
+            }
+
+            // ==========================
+            // NEXT
+            // ==========================
+            nextNav.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const page = pages[currentPage];
+
+            // Page 1 checkbox rule
+            if (currentPage === 0 && !agreeCheckbox.checked) {
+                agreeCheckbox.reportValidity();
+                return;
+            }
+
+            // Required fields validation (page 2–4)
+            if (pageHasInvalidFields(page)) {
+                page.querySelector('[required]').reportValidity();
+                return;
+            }
+
+            showPage(currentPage + 1);
+            });
+
+            // ==========================
+            // BACK
+            // ==========================
+            backNav.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage > 0) {
+                showPage(currentPage - 1);
+            }
+            });
+
+    </script>
+
+    <script>
+    document.querySelectorAll('.showPass').forEach(button => {
+        button.addEventListener('click', function() {
+            const passwordInput = button.previousElementSibling;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                button.textContent = 'hide';
+            } else {
+                passwordInput.type = 'password';
+                button.textContent = 'show';
+            }
+        });
+    });
+</script>
+
+ <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const idBtn = document.getElementById("idBtn");
+    const xBtn = document.getElementById("xBtn");
+    const idList = document.getElementById("idList");
+
+    idBtn.addEventListener("click", () => {
+        idList.classList.remove("hidden");
+    });
+
+    xBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        idList.classList.add("hidden");
+    });
+    });
+</script>
+<script>
+    // Wait for the DOM to fully load
+    document.addEventListener("DOMContentLoaded", function () {
+        const dpn = document.getElementById('dpn');
+        const dpnCard = document.getElementById('dpnCard');
+        const dpnClose = document.getElementById('dpnClose');
+
+        // Show the div when <a> is clicked
+        dpn.addEventListener('click', function (e) {
+            e.preventDefault(); // prevent page jump
+            dpnCard.classList.remove('hidden');
+        });
+
+        // Hide the div when Close button is clicked
+        dpnClose.addEventListener('click', function () {
+            dpnCard.classList.add('hidden');
+        });
+    });
+</script>
+<script>
+    document.getElementById("role").addEventListener("change", function() {
+    var role = this.value;
+    
+    // Hide both fields initially
+    document.getElementById("yearGraduateContainer").classList.add("hidden");
+    document.getElementById("yearAttendedContainer").classList.add("hidden");
+    document.getElementById("workField").classList.add("hidden");
+
+    // Show the correct field based on role selection
+    if (role === "Alumni") {
+        document.getElementById("yearGraduateContainer").classList.remove("hidden");
+        document.getElementById("workField").classList.remove("hidden");
+    } else if (role === "Former") {
+        document.getElementById("yearAttendedContainer").classList.remove("hidden");
+    }
+});
+</script>
+
+<script>
+    function enforcePhoneInput(event) {
+        event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const phoneInputs = document.querySelectorAll('.number');
+        phoneInputs.forEach(input => {
+            input.addEventListener('input', enforcePhoneInput);
+        });
+    });
+</script>
+
+<script>
+    function enforceCopyInput(event) {
+        event.target.value = event.target.value.replace(/[^1-3]/g, '').slice(0, 1);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const copyInputs = document.querySelectorAll('.cpy');
+        copyInputs.forEach(input => {
+            input.addEventListener('input', enforceCopyInput);
+        });
+    });
+</script>
+
+<script>
+let documentPrices = {};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch('/documents/prices');
+        documentPrices = await res.json();
+        console.log("✅ Document prices loaded:", documentPrices);
+
+        // Initialize existing fieldset
+        const container = document.getElementById("fieldsetsContainer");
+        const firstFieldset = container.querySelector("fieldset");
+        const typeSelect = firstFieldset.querySelector("select[name='type[]']");
+        handleDocumentTypeChange(typeSelect);
+    } catch (err) {
+        console.error("⚠️ Failed to load document prices:", err);
+    }
+});
+
+// Handle document type change for a specific fieldset
+function handleDocumentTypeChange(select) {
+    const fieldset = select.closest("fieldset");
+    const optionsSelect = fieldset.querySelector(".document-options");
+    const uploadDiv = fieldset.querySelector(".upload");
+    const fileInput = uploadDiv.querySelector("input[type='file']");
+
+    // File upload for School Copy
+    optionsSelect.onchange = () => {
+        if (optionsSelect.value === "Requirement for Other School") {
+            uploadDiv.classList.remove("hidden");
+            fileInput.setAttribute("required", true);
+        } else {
+            uploadDiv.classList.add("hidden");
+            fileInput.removeAttribute("required");
+        }
+    };
+
+    // Trigger the change once to set upload visibility
+    optionsSelect.dispatchEvent(new Event("change"));
+
+    // Update total
+    const qtyInput = fieldset.querySelector("input[name='qty[]']");
+    qtyInput.addEventListener("input", () => updateTotalAmount(fieldset));
+    updateTotalAmount(fieldset);
+}
+
+
+// Calculate total for a specific fieldset
+function updateTotalAmount(fieldset) {
+    const qtyInput = fieldset.querySelector("input[name='qty[]']");
+    const typeSelect = fieldset.querySelector("select[name='type[]']");
+    const totalSpan = fieldset.querySelector(".totalAmount");
+
+    const qty = isNaN(qtyInput.value) || qtyInput.value <= 0 ? 1 : parseInt(qtyInput.value);
+    const price = documentPrices[typeSelect.value] || 0;
+    totalSpan.innerHTML = `Total Amount: ₱${(qty * price).toFixed(2)}`;
+}
+
+// Duplicate fieldset
+document.addEventListener("DOMContentLoaded", () => {
+    const addBtn = document.getElementById("addDoc");
+    const container = document.getElementById("fieldsetsContainer");
+    const warning = document.getElementById("warning1");
+
+    // Initialize existing fieldset
+    const firstFieldset = container.querySelector("fieldset");
+    const typeSelect = firstFieldset.querySelector("select[name='type[]']");
+    handleDocumentTypeChange(typeSelect);
+
+    addBtn.addEventListener("click", () => {
+        const fieldsets = container.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1];
+
+        // Check required fields
+        const requiredFields = lastFieldset.querySelectorAll("[required]");
+        let allFilled = true;
+        requiredFields.forEach(field => {
+            if (!field.value || field.value.trim() === "") allFilled = false;
+        });
+
+        if (!allFilled) {
+            warning.classList.remove("hidden");
+            setTimeout(() => warning.classList.add("hidden"), 2000);
+            return;
+        }
+
+        // Clone fieldset
+        const clone = lastFieldset.cloneNode(true);
+
+        // Reset inputs
+        clone.querySelectorAll("input, select").forEach(inp => inp.value = "");
+        clone.querySelector(".upload").classList.add("hidden");
+        clone.querySelector(".totalAmount").innerHTML = "";
+
+        // Enable remove button
+        const removeBtnCard = clone.querySelector("#removeDocCard");
+        if (removeBtnCard) removeBtnCard.classList.remove("hidden");
+
+        const removeBtn = clone.querySelector("#removeDoc");
+        if (removeBtn) {
+            removeBtn.addEventListener("click", () => clone.remove());
+        }
+
+        container.appendChild(clone);
+
+        // Initialize new clone
+        const cloneTypeSelect = clone.querySelector("select[name='type[]']");
+        handleDocumentTypeChange(cloneTypeSelect);
+    });
+});
+</script>
+<script>
+    // Populate Day Dropdown (1-31)
+    const daySelect = document.getElementById("bDay");
+    for (let i = 1; i <= 31; i++) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        daySelect.appendChild(option);
+    }
+
+    // Populate Month Dropdown (January-December)
+    const monthSelect = document.getElementById("bMonth");
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    months.forEach(month => {
+        let option = document.createElement("option");
+        option.value = month;
+        option.textContent = month;
+        monthSelect.appendChild(option);
+    });
+
+    // Populate Year Dropdown (Only ages 19+ allowed)
+    const yearSelect = document.getElementById("bYear");
+    const currentYear = new Date().getFullYear();
+    const maxYearAllowed = currentYear - 15; // Must be 19 or older
+
+    for (let i = maxYearAllowed; i >= 1980; i--) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        yearSelect.appendChild(option);
+    }
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addBtn = document.getElementById("addDoc");
+    const container = document.getElementById("fieldsetsContainer");
+    const warning = document.getElementById("warning1");
+
+    addBtn.addEventListener("click", function () {
+        const fieldsets = container.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1];
+
+        // Check all required fields inside the last fieldset
+        const requiredFields = lastFieldset.querySelectorAll("[required]");
+        let allFilled = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value || field.value.trim() === "") {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            warning.classList.remove("hidden");
+            setTimeout(() => warning.classList.add("hidden"), 2000);
+            return;
+        }
+
+        // Clone last fieldset
+        const clone = lastFieldset.cloneNode(true);
+
+        // Reset all inputs inside clone
+        const cloneInputs = clone.querySelectorAll("input, select");
+        cloneInputs.forEach(inp => {
+            inp.value = "";
+        });
+
+        // Hide upload div on clone
+        const uploadDiv = clone.querySelector(".upload");
+        if (uploadDiv) uploadDiv.classList.add("hidden");
+
+        // Reset total amount
+        const totalSpan = clone.querySelector(".totalAmount");
+        if (totalSpan) totalSpan.innerHTML = "";
+
+        // Enable remove button for clones
+        const removeBtnCard = clone.querySelector("#removeDocCard");
+        if (removeBtnCard) removeBtnCard.classList.remove("hidden");
+
+        const removeBtn = clone.querySelector("#removeDoc");
+        if (removeBtn) {
+            removeBtn.addEventListener("click", function () {
+                clone.remove();
+            });
+        }
+
+        container.appendChild(clone);
+    });
+
+    // Activate remove button on the very first cloned fieldset (hidden by default)
+    const firstRemoveBtn = document.getElementById("removeDoc");
+    if (firstRemoveBtn) {
+        firstRemoveBtn.addEventListener("click", function () {
+            if (container.children.length > 1) {
+                firstRemoveBtn.closest("fieldset").remove();
+            }
+        });
+    }
+});
+</script>
+<script>
+// Update the grand total by summing all fieldsets
+function updateGrandTotal() {
+    const allTotals = document.querySelectorAll(".totalAmount");
+    let grandTotal = 0;
+
+    allTotals.forEach(span => {
+        // Extract numeric value from span text
+        const valueText = span.textContent.replace(/[^0-9.]/g, '');
+        const value = parseFloat(valueText) || 0;
+        grandTotal += value;
+    });
+
+    document.getElementById("grandTotal").textContent = `₱${grandTotal.toFixed(2)}`;
+}
+
+// Override previous updateTotalAmount to also update grand total
+function updateTotalAmount(fieldset) {
+    const qtyInput = fieldset.querySelector("input[name='qty[]']");
+    const typeSelect = fieldset.querySelector("select[name='type[]']");
+    const totalSpan = fieldset.querySelector(".totalAmount");
+
+    const qty = isNaN(qtyInput.value) || qtyInput.value <= 0 ? 1 : parseInt(qtyInput.value);
+    const price = documentPrices[typeSelect.value] || 0;
+
+    totalSpan.textContent = `₱${(qty * price).toFixed(2)}`;
+
+    // Update grand total whenever any individual total changes
+    updateGrandTotal();
+}
+
+// Call updateGrandTotal on page load in case there are existing fieldsets
+document.addEventListener("DOMContentLoaded", () => {
+    updateGrandTotal();
+});
+</script>
+
+
+</body>
+</html>

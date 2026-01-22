@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/au.png">
+    <title><%= title ? `${title}` : 'AUDRES25' %></title>
+    <style>
+
+    * {
+        color-scheme: light !important;
+    }
+            
+    p + p {
+        margin-top: -0.6em !important;
+    }
+    .rateStar:hover {
+        color: var(--yellow);
+        cursor: pointer;
+    }
+      @media (max-width: 1024px) {
+        body {
+            display: block;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .mainF {
+            flex-direction: column;
+            height: auto;
+            margin-bottom: 50px !important;
+        }
+        .leftF {
+            height: 200px !important;
+            width: 100%;
+        }
+        .gemF {
+            height: 100px !important;
+            margin-top: 0 !important;
+        }
+        .iconix {
+            height: 100px;
+            width: 100px;
+            padding: 10px;
+            img {
+                height: 100% !important;
+            }
+        }
+        .rem4 {
+            font-size: 2.6rem !important;
+        }
+        .rem4.p2 {
+            margin-top: -1rem !important;
+        }
+        .rem2.p6 {
+            margin-top: -0.5rem !important;
+            font-size: 1.6rem !important;
+        }
+        .rem2.p7 {
+            margin-top: -0.3rem !important;
+            font-size: 1.6rem !important;
+        }
+        .rem4.p1 {
+            margin-top: 0 !important;
+        }
+        .rightF {
+            height: fit-content;
+            width: 100%;
+            margin-bottom: 100px !important;
+        }
+        #headF {
+            flex-direction: column !important;
+        }
+        #rateF {
+            bottom: 0 !important;
+        }
+
+        * {
+            color-scheme: light !important;
+        }
+        .gradientText {
+        background: linear-gradient(to bottom,white,  white, var(--tint8));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.2),
+            0 0 8px rgba(61, 77, 255, 0.3),
+            0 0 10px rgba(255, 255, 255, 0.2);
+            color-scheme: light !important;
+            -webkit-print-color-adjust: exact; /* prevent color alterations */
+            -webkit-text-fill-color: initial; /* reset text fill */
+            print-color-adjust: exact;    
+        }
+      }
+    </style>
+</head>
+<body class="abstractBG">
+
+    <img src="/images/au.png" alt="" class="absolute top0 right0 scale2 bgWhite corner500" style="opacity: 0.05; filter: grayscale(0.9); z-index: 0;" id="watermark">
+    <div class="mainF" style="z-index: 500 !important;">
+        <div class="h700 padding20 col justifyStart relative leftF width45">
+            <div class="height0 col absolute translateCenter" id="headF">
+                <div class="padding10 gemF relative">
+                    <div class="corner500 liquid w250 h250 iconix padding10">
+                        <img src="/images/au.png" alt="" class="corner500 h200 w200 bgWhite glowImg2">
+                    </div>
+                </div>
+                <p class="rem4 textWrap textCenter glowImg3 p1">AU Registrar Document</p>
+                <p class="rem4 textWrap textCenter glowImg3 p2" style="margin-top: -3.6rem;">Request System</p>
+                <p class="rem2 textCenter glowImg3 p6 hidden" style="margin-top: 1rem !important;">Request and track your registrar documents</p>
+                <p class="rem2 textCenter glowImg3 p7 hidden" style="margin-top: -3.2rem;">online—fast and easy.</p>
+            </div>
+            <div class="height0 absolute left0 bottom20 col hidden" id="rateF">
+                <div class="height0 width0 hidden">
+                    <p>Average Rating: <%= ratings.averageRating.toFixed(1) %> ⭐ &nbsp; | &nbsp; <%= ratings.totalRatings %> votes</p>
+                </div>
+                <section class="corner10 col padding0">
+                    <p class="textCenter"><i class="fas fa-phone"></i> <%= seedUser?.phone %> &nbsp; | &nbsp; <i class="fas fa-envelope"></i> <%= seedUser?.email %></p>
+                </section>
+            </div>
+        </div>
+        <div class="padding20 rightF width35 col height0 relative" style="z-index: 500 !important;">
+            <%- body %>
+        </div>
+    </div>
+
+        <script>
+        document.querySelectorAll('.showPass').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+
+    
+    
+    <% if (message) { %>
+    <div class="height0 col absolute width50 bgWhite bottom10 left10 corner10 shadow3 padding5 hidden" style="z-index: 600;">
+        <span style="color: red;" class="bgRed100 textCenter rem07"><%= message %></span>
+    </div>
+    <% } else { %>
+    <% } %>
+    
+</body>
+</html>

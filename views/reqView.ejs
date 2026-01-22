@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/logo.png">
+    <title><%= title ? `${title}` : 'AUDRES25' %></title>
+    <style>
+        body::-webkit-scrollbar {
+            display: block;
+        }
+        body {
+            color: white;
+            background: 
+                radial-gradient(circle at 10% 5%, var(--shade15), transparent 25%),
+                radial-gradient(circle at 95% 10%,  var(--tint4), transparent 30%),
+                radial-gradient(circle at 95% 90%,  var(--tint6), transparent 24%),
+                radial-gradient(circle at 10% 60%,  var(--tint4), transparent 30%),
+                radial-gradient(circle at 50% 50%,  var(--tint6), transparent 50%);
+            background-blend-mode: lighten;
+            backdrop-filter: blur(10px);
+            background-color: var(--shade12);
+        }
+        #noteX p {
+            font-size: 14px !important;
+        }
+      @media (max-width: 1024px) {
+        body {
+            display: block;
+            overflow-y: auto;
+            height: 100vh;
+            background: rgb(237, 237, 237);
+            color: var(--shade12);
+        }
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        #mainF {
+            flex-direction: column;
+            margin-bottom: 100px;
+            gap: 0;
+            height: auto;
+        }
+        #mainF > section {
+            width: 100%;
+        }
+        .dtlCard {
+            flex-direction: column;
+        }
+        .dtl {
+            align-items: start;
+            width: 100%;
+        }
+      }
+    </style>
+</head>
+<body class="block overflow-y1">
+    
+    <section class="absolute top10 right10 width0 opacity0">
+        <div class="selectBar">
+            <select name="status" id="status">
+                <option value="Pending" <%= rq.status === "Pending" ? "selected" : "" %>>Pending</option>
+                <option value="Reviewed" <%= rq.status === "Reviewed" ? "selected" : "" %>>Reviewed</option>
+                <option value="Assessed" <%= rq.status === "Assessed" ? "selected" : "" %>>Assessed</option>
+                <option value="For Verification" <%= rq.status === "For Verification" ? "selected" : "" %>>For Verification</option>
+                <option value="Verified" <%= rq.status === "Verified" ? "selected" : "" %>>Verified</option>
+                <option value="For Release" <%= rq.status === "For Release" ? "selected" : "" %>>For Release</option>
+                <option value="Claimed" <%= rq.status === "Claimed" ? "selected" : "" %>>Claimed</option>
+            </select>   
+        </div>
+        <script>
+        document.getElementById("status").addEventListener("change", async function() {
+            const status = this.value;
+            const id = "<%= rq._id %>"; // request ID
+
+            try {
+                const res = await fetch(`/update-status/${id}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status })
+                });
+
+                if (res.ok) {
+                    console.log("Status updated!");
+                    // Optionally reload page or update progress tracker dynamically
+                    location.reload();
+                } else {
+                    alert("Failed to update status");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error updating status");
+            }
+        });
+        </script>
+    </section>
+
+    <section class="gap20 alignStart padding0" id="mainF">
+        <section class="col width35">
+            <section class="justifyBetween padding5">
+                <% if ( back === "hom") { %>
+                <a href="/hom" class="nav"><i class="fas fa-chevron-left"></i>Go Back</a>
+                <% } else { %>
+                <a href="/reqAll" class="nav"><i class="fas fa-chevron-left"></i>Go Back</a>
+                <% } %>
+                <p class="rem2 str400">#<%= rq.tr %></p>
+            </section>
+            <section class="corner20 col padding10 gap10 bgWhite">
+                
+               <%- include('partials/notes3') %>
+                <%- include('partials/status') %>
+
+            </section>
+        </section>
+        <section class="col alignStart width35">
+            <section class="justifyStart">
+                <p class="rem2 str400">Request Details</p>
+            </section>
+            <section class="bgWhite padding15 col shadow1 corner20 col colorPrimary">
+                <section class="corner20 dtlCard justifyBetween gap10 padding0">
+                    <section class="col alignStart dtl bgSoft corner15 padding15">
+                        <p class="size12"><i class="fas fa-receipt"></i> Date Requested</p>
+                        <%
+                        const options = { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric', 
+                            hour: 'numeric', 
+                            minute: '2-digit', 
+                            hour12: true 
+                        }; 
+                        const formattedDate = new Date(rq.createdAt).toLocaleString('en-US', options); 
+                        %>
+                        <p class="size12"><%= formattedDate %></p>
+                    </section>
+                    <section class="col alignEnd dtl bgSoft corner15 padding15">
+                        <p class="size12"><i class="fas fa-receipt"></i> Transaction Number</p>
+                        <p class="size12"><%= rq.tr %></p>
+                    </section>
+                </section>
+                <section class="bgSoft col padding10 corner15 marginTop10 gap10">
+                    <% if (items.length === 0) { %>
+                        <p class="str400 rem14">No items found for this request.</p>
+                    <% } else { %>
+                        <% items.forEach((it, index) => { %>
+                            <section class="bgWhite shadow1 corner12 padding15 relative">
+                                <a href="" class="nav cnavLG absolute left15 disabled glass colorPrimary">
+                                    <i class="fas fa-file size35"></i>
+                                </a>
+                                <section class="padding0 alignStart justifyCenter col paddingLeft70">
+                                    <p class="size12 str500"><%= it.qty %> <%= it.type %></p>
+                                    <p class="size12">for <%= it.purpose %> Purpose</p>
+                                    <p class="size12"><%= it.semester %> Semester &bull; <%= it.schoolYear %></p>
+                                    <% if (it.remarks) { %>
+                                        <p class="size10 str400 bgYellow100 padding5" style="margin-top: 5px !important;">
+                                            <i class="fas fa-info-circle"></i> Note: <%= it.remarks %>
+                                        </p>
+                                    <% } %>
+                                
+                                <% if (it.type === 'Certificate of Grades') { %>
+                                    <p class="bgBlue100 textBalance" style="margin-top: 5px !important;">
+                                    Kindly bring two (2) photocopies of your 2x2 ID picture.
+                                    </p>
+                                <% } %>
+                                </section>
+                                <section class="padding0 justifyEnd absolute right20 translateY hidden">
+                                    <% if (it.status === "Declined") { %>
+                                        <a href="" class="nav cnav disabled bgRed100"><i class="fas fa-xmark-circle"></i></a>
+                                    <% } else if ( it.status === "Approved") { %>
+                                        <a href="" class="nav cnav disabled bgGreen100"><i class="fas fa-check-circle"></i></a>
+                                    <% } else { %>
+                                        <a href="" class="nav cnav disabled bgBlue100"><i class="fas fa-hourglass-half"></i></a>
+                                    <% } %>
+                                </section>
+                            </section>
+                        <% }) %>
+                    <% } %>
+                </section>
+                <section class="bgBlue100 corner15 justifyBetween padding10 marginTop15 hidden" style="align-self: center;">
+                    <p class="size16"><i class="fas fa-info-circle"></i> Total Payables</p>
+                    <p class="size16 str500">&#8369;<%= totalAmount || "0" %>.00</p>
+                </section>
+            </section>
+        </section>
+        <% if ( rq.status !== "Pending" && rq.status !== "Reviewed" && rq.status !== "Assessed" ) { %>
+            <% if (rq.payPhoto && rq.payPhoto.length > 0) { %>
+                <section class="col width20">
+                    <section class="justifyStart"><p class="rem18">Payment Details</p></section>
+                    <section class="corner20 col bgWhite gap5">
+                        <section class="payment-photos col">
+                            <% if (rq.payPhoto && rq.payPhoto.length > 0) { %>
+                                <% rq.payPhoto.forEach(photo => { %>
+                                    <img src="<%= photo %>" 
+                                        alt="Payment Proof" 
+                                        onerror="this.onerror=null; this.src='/images/annPhoto2.jpg';" 
+                                        class="borderPrimary width100 corner14 marginBottom5">
+                                <% }) %>
+                            <% } else { %>
+                                <img src="/images/annPhoto2.jpg" 
+                                    alt="Profile" 
+                                    class="borderPrimary width100 corner14">
+                            <% } %>
+                            </section>
+
+                    </section>
+                </section>
+            <% } %>
+        <% } %>
+    </section>
+</body>
+</html>

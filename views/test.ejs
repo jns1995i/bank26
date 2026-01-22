@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <link rel="stylesheet" href="/style.css?v=1.0">
+    <link rel="icon" href="/images/au.png">
+    <title><%= title ? `${title} | AUDRES25` : 'AUDRES25' %></title>
+    <style>
+        body {
+            background-image: url('/images/annPhoto2.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 100% 100%;
+        }
+      @media (max-width: 900px) {
+          .unau {
+            width: 80% !important;
+          }
+      }
+      #info p {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+      }
+      #info p i {
+          width: 18px !important;
+      }
+      
+        .gradientText {
+        background: linear-gradient(to bottom,white,  white, var(--tint8));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.2),
+            0 0 8px rgba(61, 77, 255, 0.3),
+            0 0 10px rgba(255, 255, 255, 0.2);
+            color-scheme: light !important;
+            -webkit-print-color-adjust: exact; /* prevent color alterations */
+            -webkit-text-fill-color: initial; /* reset text fill */
+            print-color-adjust: exact;    
+        }
+    </style>
+</head>
+
+<% if ( user.access === 1) { %>
+<body class="gap20 padding10 <% if (active === 'acc') { %> gap10 <% } %> ">
+  <div class="absolute translateCenter bgModal8 index5 hidden" id="lgCard">
+  <div class="bgWhite cornerRem2 height0 width25 col padding20">
+    <%- include('icons/lg') %>
+    <p class="rem14 textCenter">Are you sure you want to log out?</p>
+    <div class="height0 marginTop10 gap10">
+      <a href="javascript:void(0)" class="nav w100" id="lgClose"> Cancel</a>
+      <a href="/logout" class="nav pnav w100"> Log Out</a>
+    </div>
+  </div>
+</div>
+  <div class="sidef liquid">
+    <div class="height10 porcelain corner14">
+      <img src="/images/annPhoto2.jpg" alt="" class="h55 w55 wMin55 corner500 shadow2">
+    </div>
+    <div class="height80 menu relative">
+      <br>
+      <a href="" class="nav mnav <% if ( active === 'dsb') { %> active <% } %>"> <i class="bi bi-grid-fill"></i> Dashboard</a>
+      <a href="" class="nav mnav <% if ( active === 'srv') { %> active <% } %>"> <i class="fas fa-receipt"></i> Transactions</a>
+      <a href="" class="nav mnav <% if ( active === 'emp') { %> active <% } %>"> <i class="fas fa-user-tie"></i> Employees</a>
+      <a href="" class="nav mnav <% if ( active === 'cog') { %> active <% } %>"> <i class="fas fa-cog"></i> Settings</a>
+      <div class="height0 absolute bottom5 translateX">
+        <a href="" class="nav glass width100 <% if ( active === '') { %> active <% } %>" style="opacity: 0;"> <i class="fas fa-share-square"></i> Log Out</a>
+      </div>
+
+    </div>
+    <div class="height10 justifyStart liquid white padding10">
+      <% if (active === 'acc') { %>
+        <a href="" class="liquid corner500 h50 w50" style="min-width: 50px;">
+            <img src="<%= user.photo ? user.photo : '/images/profile.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.png';" class="h50 w50 corner500 borderWhite">
+        </a>
+        <section class="width0 col alignStart">
+          <p class="rem11 str400 textWrap">Profile</p>
+          <p class="rem11 str400 textWrap">Management</p>
+        </section>
+      <% } else { %>
+        <a href="" class="liquid corner500 h50 w50" style="min-width: 50px;">
+            <img src="<%= user.hel ? user.hel : '/images/profile.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.png';" class="h50 w50 corner500 borderWhite">
+        </a>
+        <section class="width0 col alignStart">
+          <p class="rem11 str400 textWrap">Ferry Niebre</p>
+          <p class="rem09 str400 textWrap">Welcome Admin</p>
+        </section>
+      <% } %>
+    </div>
+  </div>
+  <div class="mainf padding5 <% if (active === 'acc') { %> abstractBG corner15 <% } %> ">
+    <div class=" corner10"></div>
+  </div>
+
+<% if ( active === "srv" ) { %>
+  <div class="absolute left0 top0 width20 bgWhite col shadow3 block overflow-y1 padding10 hidden">
+    <section class="col alignStart">
+      <p class="size20 str500">Registrar Staff</p>
+      <hr>
+    </section>
+    <% users.forEach(user => { %>
+      <div class="height0 col marginBottom10 shadow1 corner12 padding10">
+          <p><%= user.fName %> <%= user.lName %></p>
+          <p>Total requests: <%= user.requestSummary.total %></p>
+          <p>Pending: <%= user.requestSummary.pending %>, Processing: <%= user.requestSummary.processing %></p>
+          <p>Approved: <%= user.requestSummary.approved %>, For Release: <%= user.requestSummary.forRelease %></p>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (error) { %>
+  <div class="col gap10 absolute bgModal8">
+    <p style="color: red;" class="bgRed100"><%= error %></p>
+  </div>
+<% } else { %>
+<% } %>
+
+</body>
+
+
+
+
+
+
+
+
+
+<% } else { %>
+<body class="padding0 abstractBG">
+  <div class="width30 bgWhite height0 cornerRem12 padding20 col colorPrimary unau">
+    <%- include('icons/warning') %>
+    <p class="rem3 str500">Unauthorized Access</p>
+    <p class="rem15 str400">Do not access this page!</p>
+    <br>
+    <a href="javascript:history.back()" class="nav"><i class="fas fa-chevron-left"></i>Go Back</a>
+  </div>
+</body>
+<% } %>
+</html>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const lgOpen = document.getElementById('lgOpen');
+  const lgClose = document.getElementById('lgClose');
+  const lgCard = document.getElementById('lgCard');
+
+  // Open the logout modal
+  lgOpen.addEventListener('click', () => {
+    lgCard.classList.remove('hidden');
+  });
+
+  // Close the logout modal
+  lgClose.addEventListener('click', () => {
+    lgCard.classList.add('hidden');
+  });
+
+  // Optional: close modal when clicking outside
+  lgCard.addEventListener('click', (e) => {
+    if (e.target === lgCard) {
+      lgCard.classList.add('hidden');
+    }
+  });
+});
+</script>
+
+    <script>
+        document.querySelectorAll('.showPass').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>

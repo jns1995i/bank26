@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/logo.png">
+    <title><%= title ? `${title}` : 'AUDRES25' %></title>
+    <style>
+  body {
+    overflow-y: auto !important;
+    display: block !important;
+    padding: 5px;
+  }
+  body::-webkit-scrollbar {
+    display: flex;
+  }
+  .mainF {
+    height: auto !important;
+  }
+  .leftF {
+    align-self: start !important;
+    justify-content: start !important;
+  }
+  #headF {
+    align-items: start;
+    position: initial !important;
+    top: initial !important;
+    left: initial !important;
+    transform: none !important;
+  }
+  .gemF {
+      height: 200px !important;
+      img {
+          height: 150px;
+      }
+  }
+  .rem48 {
+      font-size: 3rem;
+  }
+  .rem48.p2 {
+      margin-top: -2rem !important;
+      font-size: 3rem;
+  }
+  .rem48.p1 {
+      font-size: 3rem;
+  }
+  .logoF {
+      height: 60px;
+      width: 60px;
+      position: absolute;
+      top: 30% !important;
+      left: 53% !important;
+  }
+  img.logo {
+      height: 70%;
+  }
+      @media (max-width: 1024px) {
+        body {
+            display: block;
+            overflow-y: auto;
+            height: 100vh;
+        }
+  body::-webkit-scrollbar {
+    display: none;
+  }
+        .mainF {
+            flex-direction: column;
+            height: auto;
+            margin-bottom: 50px !important;
+        }
+        .leftF {
+          height: auto !important;
+            width: 100%;
+        }
+        .gemF {
+          height: auto !important;
+            margin-top: 0 !important;
+            img {
+                height: 70px;
+            }
+        }
+        .logoF {
+            height: 30px;
+            width: 30px;
+            position: absolute;
+            top: 35% !important;
+            left: 53% !important;
+        }
+        img.logo {
+            height: 70%;
+        }
+        .rem48 {
+            font-size: 3rem;
+        }
+        .rem48.p2 {
+            margin-top: -2rem !important;
+        }
+        .rem48.p1 {
+            margin-top: -1.6rem !important;
+        }
+        .rightF {
+            height: fit-content;
+            width: 100%;
+            padding-block: 0 !important;
+            margin-bottom: 100px !important;
+        }
+        #headF {
+            flex-direction: column-reverse !important;
+        }
+        .crd {
+          display: none !important;
+        }
+         .colF1 {
+          flex-direction: column !important;
+          .field {
+            width: 100%;
+          }
+         }
+         .sbBtn {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+         }
+      }
+    </style>
+</head>
+<body class="gradient">
+
+    <div class="mainF" style="z-index: 500 !important;">
+        <div class="height0 padding20 col alignStart gap10 relative leftF width30">
+            
+            <br>
+
+             <a href="/hom" class="nav liquid"><i class="fas fa-chevron-left"></i> Go Back to Login</a>
+            
+            <section class="bgWhite col padding5 corner20 relative">
+                <section class="justifyStart"><p class="size30">Hi, <%= user.fName %></p></section>
+                <section class="aluminum corner15 padding20 col alignStart relative">
+                    <p class="size16 str400 width70">Need Help</p>
+                    <p class="size16 str400 width70">Requesting Document?</p>
+                    <br>
+                    <a href="/ins2" class="nav porcelain">Learn more here <i class="fas fa-chevron-right"></i></a>
+                </section>
+                <img src="/images/student.png" alt="" class="absolute h240 top0" style="right: -60px;">
+            </section>
+            
+            <div class="height0 padding10 borderRadius10 justifyBetween width100 gap10 relative corner15 liquidX hidden">
+                <p class="size16 gap10 alignCenter">Need Help?</p>
+                <a href="/ins2" class="nav liquid">Learn more here <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+        </div>
+        
+        <div class="padding20 rightF width45 col height0 relative" style="z-index: 100 !important;">
+
+            <form action="/reqDoc" method="POST" enctype="multipart/form-data" class="padding30 card alignCenter relative colorPrimary" style="z-index: 100;">
+                <div class="col justifyStart alignStart gap10 relative">
+                    <p class="size28 str400 colorPrimary">Request Form</p>
+                </div>
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <p class="bgRed100 marginTop10 width100"><%= error %></p>
+                <% } %>
+                <br>
+                <div class="col height0 alignStart gap5" id="editCard">
+                        <div class="fieldsetsContainer col height0 padding0 width100" id="fieldsetsContainer">
+                            <fieldset class="marginBottom10">
+                                <div class="height0 justifyEnd hidden" id="removeDocCard"><a href="javascript:void(0)" class="nav dnav" id="removeDoc">Remove</a></div>
+                                <div class="row gap10  colF1">
+                                    <div class="field">
+                                        <Label>Document Type</Label>
+                                        <div class="selectBar">
+                                            <select class="document-type" name="type[]" onchange="handleDocumentTypeChange(this)" required>
+                                                <option value="">Select</option>
+                                                <% documents.forEach(doc => { %>
+                                                    <option value="<%= doc.type %>"><%= doc.type %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label>No. Copies (Max. 3)</label>
+                                        <input name="qty[]" type="number" class="number" required>
+                                    </div>
+                                </div>
+                          <div class="wf" style="display: none;">
+    This is WF content.
+</div>
+
+
+
+                                <div class="row gap10 marginTop10">
+                                    <div class="field additional-options">
+                                        <label>Purpose</label>
+                                        <div class="selectBar">
+                                            <select class="document-options" name="purpose[]" onchange="handleOptionChange(this)" required>
+                                                <option value="" selected disabled>--Select Purpose</option>
+                                                <option value="Reference">Reference</option>
+                                                <option value="Requirement for Other School">Requirement for Other School</option>
+                                                <option value="Board Exam">Board Exam</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field upload hidden marginTop10">
+                                    <label class="str500">Please upload photo of School Request*</label>
+                                    <input type="file" name="reqPhoto[]" class="bgYellow">
+                                </div>
+
+                                <p class="bgRed100 limitPhoto hidden marginTop10"></p>
+                                <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    const input = document.querySelector('input[name="reqPhoto[]"]');
+                                    const warning = document.querySelector('.limitPhoto');
+
+                                    const maxSize = 500 * 1024 * 1024; // 500MB
+
+                                    input.addEventListener('change', function () {
+                                        warning.classList.add("hidden");
+                                        warning.textContent = "";
+
+                                        if (!this.files || this.files.length === 0) return;
+
+                                        const file = this.files[0];
+
+                                        // ✅ Check if file is an image
+                                        if (!file.type.startsWith("image/")) {
+                                            warning.textContent = "Only photo files are allowed!";
+                                            warning.classList.remove("hidden");
+                                            this.value = ""; // clear uploaded file
+                                            return;
+                                        }
+
+                                        // ✅ Check file size
+                                        if (file.size > maxSize) {
+                                            warning.textContent = "Photo must not be larger than 500MB!";
+                                            warning.classList.remove("hidden");
+                                            this.value = ""; // clear uploaded file
+                                            return;
+                                        }
+                                    });
+                                });
+                                </script>
+                                <br>
+                                <label class="rem1 marginBottom5 hidden">If applicable:</label>
+                                <div class="row gap10  colF1">
+                                    <div class="field">
+                                        <label for="">School Year</label>
+                                        <div class="selectBar">
+                                            <select name="schoolYear[]" id="schoolYear">
+                                                <option value="" selected disabled>Select</option>
+                                                <% for (let year = 2025; year >= 1990; year--) { %>
+                                                    <option value="<%= year %>-<%= year + 1 %>">
+                                                        <%= year %>-<%= year + 1 %>
+                                                    </option>
+                                                <% } %>
+                                            </select>                                
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label for="">Semester</label>
+                                        <div class="selectBar">
+                                            <select name="semester[]" id="">
+                                                <option value="First">First</option>
+                                                <option value="Second">Second</option>
+                                                <option value="Summer">Summer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <span class="totalAmount marginTop10"></span>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <p class="height0 bgBlue100 hidden textCenter" id="warning1"><i class="fas fa-exclamation-circle"></i> Please fill out all the required fields before adding a new one!</p>
+                        <div class="height0 bgSoft darkGray corner10 padding10 textCenter str500 width100 justifyCenter alignCenter hidden"><i class="fas fa-info-circle marginRight5"></i> Dismissal Form &nbsp; <a href="/docs/df.pdf" class="underline colorPrimary str500 width0 padding0 margin0 size12" download>Download Here</a></div>
+                        <div class="height0 justifyBetween padding5">
+                            <p class=" str500">Need Another Document?</p>
+                            <a href="javascript:void(0)" class="nav pnav" id="addDoc"><i class="fas fa-plus"></i> Additional</a>
+                        </div>
+                        <div class="height0 bgBlue100 TextCenter"> Your total payable amount is &nbsp; <span id="grandTotal"> ₱0.00</span></div>
+                </div>   
+                <div class="height0 row marginBlock15">
+                    <p class="size12 flex textCenter"><input type="checkbox" class="width0 marginRight10" required> I have read and understood the DATA PRIVACY NOTICE</p>
+                </div>
+                <div class="bgYellow cornerRem1 padding20">
+                    TAKE NOTE: Please review all the details carefully before submitting your request. Ensure that all selections and information are correct, as changes may not be allowed after submission.
+                </div>
+                <div class="field height0 marginTop15 width100 alignEnd">
+                    <button type="submit" class="nav tnav pnav sbBtn textCenter"><i class="fas fa-check-circle"></i>Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+
+    <script>
+    document.querySelectorAll('.showPass').forEach(button => {
+        button.addEventListener('click', function() {
+            const passwordInput = button.previousElementSibling;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                button.textContent = 'hide';
+            } else {
+                passwordInput.type = 'password';
+                button.textContent = 'show';
+            }
+        });
+    });
+</script>
+
+ <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const idBtn = document.getElementById("idBtn");
+    const xBtn = document.getElementById("xBtn");
+    const idList = document.getElementById("idList");
+
+    idBtn.addEventListener("click", () => {
+        idList.classList.remove("hidden");
+    });
+
+    xBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        idList.classList.add("hidden");
+    });
+    });
+</script>
+<script>
+    // Wait for the DOM to fully load
+    document.addEventListener("DOMContentLoaded", function () {
+        const dpn = document.getElementById('dpn');
+        const dpnCard = document.getElementById('dpnCard');
+        const dpnClose = document.getElementById('dpnClose');
+
+        // Show the div when <a> is clicked
+        dpn.addEventListener('click', function (e) {
+            e.preventDefault(); // prevent page jump
+            dpnCard.classList.remove('hidden');
+        });
+
+        // Hide the div when Close button is clicked
+        dpnClose.addEventListener('click', function () {
+            dpnCard.classList.add('hidden');
+        });
+    });
+</script>
+<script>
+    document.getElementById("role").addEventListener("change", function() {
+    var role = this.value;
+    
+    // Hide both fields initially
+    document.getElementById("yearGraduateContainer").classList.add("hidden");
+    document.getElementById("yearAttendedContainer").classList.add("hidden");
+
+    // Show the correct field based on role selection
+    if (role === "Alumni") {
+        document.getElementById("yearGraduateContainer").classList.remove("hidden");
+    } else if (role === "Former") {
+        document.getElementById("yearAttendedContainer").classList.remove("hidden");
+    }
+});
+
+</script>
+
+<script>
+    function enforceNumericInput(event) {
+        event.target.value = event.target.value.replace(/[^1-3]/g, '').slice(0, 1);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const phoneInputs = document.querySelectorAll('.number');
+        phoneInputs.forEach(input => {
+            input.addEventListener('input', enforceNumericInput);
+        });
+    });
+</script>
+<script>
+
+let documentPrices = {};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch('/documents/prices');
+        documentPrices = await res.json();
+        console.log("✅ Document prices loaded:", documentPrices);
+
+        // Initialize existing fieldset
+        const container = document.getElementById("fieldsetsContainer");
+        const firstFieldset = container.querySelector("fieldset");
+        const typeSelect = firstFieldset.querySelector("select[name='type[]']");
+        handleDocumentTypeChange(typeSelect);
+    } catch (err) {
+        console.error("⚠️ Failed to load document prices:", err);
+    }
+});
+
+// Handle document type change for a specific fieldset
+function handleDocumentTypeChange(select) {
+    const fieldset = select.closest("fieldset");
+    const optionsSelect = fieldset.querySelector(".document-options");
+    const uploadDiv = fieldset.querySelector(".upload");
+    const fileInput = uploadDiv.querySelector("input[type='file']");
+
+    // File upload for School Copy
+    optionsSelect.onchange = () => {
+        if (optionsSelect.value === "Requirement for Other School") {
+            uploadDiv.classList.remove("hidden");
+            fileInput.setAttribute("required", true);
+        } else {
+            uploadDiv.classList.add("hidden");
+            fileInput.removeAttribute("required");
+        }
+    };
+
+    // Trigger the change once to set upload visibility
+    optionsSelect.dispatchEvent(new Event("change"));
+
+    // Update total
+    const qtyInput = fieldset.querySelector("input[name='qty[]']");
+    qtyInput.addEventListener("input", () => updateTotalAmount(fieldset));
+    updateTotalAmount(fieldset);
+}
+
+// Calculate total for a specific fieldset
+function updateTotalAmount(fieldset) {
+    const qtyInput = fieldset.querySelector("input[name='qty[]']");
+    const typeSelect = fieldset.querySelector("select[name='type[]']");
+    const totalSpan = fieldset.querySelector(".totalAmount");
+
+    const qty = isNaN(qtyInput.value) || qtyInput.value <= 0 ? 1 : parseInt(qtyInput.value);
+    const price = documentPrices[typeSelect.value] || 0;
+    totalSpan.innerHTML = `Total Amount: ₱${(qty * price).toFixed(2)}`;
+}
+
+// Duplicate fieldset
+document.addEventListener("DOMContentLoaded", () => {
+    const addBtn = document.getElementById("addDoc");
+    const container = document.getElementById("fieldsetsContainer");
+    const warning = document.getElementById("warning1");
+
+    // Initialize existing fieldset
+    const firstFieldset = container.querySelector("fieldset");
+    const typeSelect = firstFieldset.querySelector("select[name='type[]']");
+    handleDocumentTypeChange(typeSelect);
+
+    addBtn.addEventListener("click", () => {
+        const fieldsets = container.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1];
+
+        // Check required fields
+        const requiredFields = lastFieldset.querySelectorAll("[required]");
+        let allFilled = true;
+        requiredFields.forEach(field => {
+            if (!field.value || field.value.trim() === "") allFilled = false;
+        });
+
+        if (!allFilled) {
+            warning.classList.remove("hidden");
+            setTimeout(() => warning.classList.add("hidden"), 2000);
+            return;
+        }
+
+        // Clone fieldset
+        const clone = lastFieldset.cloneNode(true);
+
+        // Reset inputs
+        clone.querySelectorAll("input, select").forEach(inp => inp.value = "");
+        clone.querySelector(".upload").classList.add("hidden");
+        clone.querySelector(".totalAmount").innerHTML = "";
+
+        // Enable remove button
+        const removeBtnCard = clone.querySelector("#removeDocCard");
+        if (removeBtnCard) removeBtnCard.classList.remove("hidden");
+
+        const removeBtn = clone.querySelector("#removeDoc");
+        if (removeBtn) {
+            removeBtn.addEventListener("click", () => clone.remove());
+        }
+
+        container.appendChild(clone);
+
+        // Initialize new clone
+        const cloneTypeSelect = clone.querySelector("select[name='type[]']");
+        handleDocumentTypeChange(cloneTypeSelect);
+    });
+});
+</script>
+<script>
+    // Populate Day Dropdown (1-31)
+    const daySelect = document.getElementById("bDay");
+    for (let i = 1; i <= 31; i++) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        daySelect.appendChild(option);
+    }
+
+    // Populate Month Dropdown (January-December) with values as words
+const monthSelect = document.getElementById("bMonth");
+const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
+
+months.forEach(month => {
+    let option = document.createElement("option");
+    option.value = month; // Store month name as value
+    option.textContent = month;
+    monthSelect.appendChild(option);
+});
+
+
+    // Populate Year Dropdown (Current Year to 1980)
+    const yearSelect = document.getElementById("bYear");
+    const currentYear = new Date().getFullYear();
+
+    for (let i = currentYear; i >= 1980; i--) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        yearSelect.appendChild(option);
+    }
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addBtn = document.getElementById("addDoc");
+    const container = document.getElementById("fieldsetsContainer");
+    const warning = document.getElementById("warning1");
+
+    addBtn.addEventListener("click", function () {
+        const fieldsets = container.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1];
+
+        // Check all required fields inside the last fieldset
+        const requiredFields = lastFieldset.querySelectorAll("[required]");
+        let allFilled = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value || field.value.trim() === "") {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            warning.classList.remove("hidden");
+            setTimeout(() => warning.classList.add("hidden"), 2000);
+            return;
+        }
+
+        // Clone last fieldset
+        const clone = lastFieldset.cloneNode(true);
+
+        // Reset all inputs inside clone
+        const cloneInputs = clone.querySelectorAll("input, select");
+        cloneInputs.forEach(inp => {
+            inp.value = "";
+        });
+
+        // Hide upload div on clone
+        const uploadDiv = clone.querySelector(".upload");
+        if (uploadDiv) uploadDiv.classList.add("hidden");
+
+        // Reset total amount
+        const totalSpan = clone.querySelector(".totalAmount");
+        if (totalSpan) totalSpan.innerHTML = "";
+
+        // Enable remove button for clones
+        const removeBtnCard = clone.querySelector("#removeDocCard");
+        if (removeBtnCard) removeBtnCard.classList.remove("hidden");
+
+        const removeBtn = clone.querySelector("#removeDoc");
+        if (removeBtn) {
+            removeBtn.addEventListener("click", function () {
+                clone.remove();
+            });
+        }
+
+        container.appendChild(clone);
+    });
+
+    // Activate remove button on the very first cloned fieldset (hidden by default)
+    const firstRemoveBtn = document.getElementById("removeDoc");
+    if (firstRemoveBtn) {
+        firstRemoveBtn.addEventListener("click", function () {
+            if (container.children.length > 1) {
+                firstRemoveBtn.closest("fieldset").remove();
+            }
+        });
+    }
+});
+</script>
+<script>
+// Update the grand total by summing all fieldsets
+function updateGrandTotal() {
+    const allTotals = document.querySelectorAll(".totalAmount");
+    let grandTotal = 0;
+
+    allTotals.forEach(span => {
+        // Extract numeric value from span text
+        const valueText = span.textContent.replace(/[^0-9.]/g, '');
+        const value = parseFloat(valueText) || 0;
+        grandTotal += value;
+    });
+
+    document.getElementById("grandTotal").textContent = `₱${grandTotal.toFixed(2)}`;
+}
+
+// Override previous updateTotalAmount to also update grand total
+function updateTotalAmount(fieldset) {
+    const qtyInput = fieldset.querySelector("input[name='qty[]']");
+    const typeSelect = fieldset.querySelector("select[name='type[]']");
+    const totalSpan = fieldset.querySelector(".totalAmount");
+
+    const qty = isNaN(qtyInput.value) || qtyInput.value <= 0 ? 1 : parseInt(qtyInput.value);
+    const price = documentPrices[typeSelect.value] || 0;
+
+    totalSpan.textContent = `₱${(qty * price).toFixed(2)}`;
+
+    // Update grand total whenever any individual total changes
+    updateGrandTotal();
+}
+
+// Call updateGrandTotal on page load in case there are existing fieldsets
+document.addEventListener("DOMContentLoaded", () => {
+    updateGrandTotal();
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('select[name="type[]"]').forEach(select => {
+        select.addEventListener('change', function() {
+            const wfDiv = select.closest('fieldset').querySelector('.wf');
+            console.log("Selected:", `"${select.value}"`); // debug to see spaces
+            if (select.value.trim().toLowerCase() === "honorable dismissal") {
+                wfDiv.style.display = "block";
+            } else {
+                wfDiv.style.display = "none";
+            }
+        });
+
+        // Trigger once in case the value is already set on load
+        select.dispatchEvent(new Event('change'));
+    });
+});
+</script>
+
+
+</body>
+</html>

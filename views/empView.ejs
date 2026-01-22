@@ -1,0 +1,560 @@
+<% layout('layout') %>
+
+<style>
+    .fcrd {
+        padding: 20px !important;
+        width: 100% !important;
+        border-radius: 25px;
+    }
+    #warningIcon {background-color:rgb(245,235,255);border:0.5px solid rgba(138,43,226,0.6);color:blueviolet !important; padding: 5px; border-radius: 0.7rem; text-align: center;
+    }
+</style>
+
+<a href="<% if ( back === 'emp') { %> /emp
+<% } else if ( back === 'arc') { %> /empArc
+<% } else { %> /emp <% } %> " class="nav absolute left10 top10"><i class="fas fa-chevron-left"></i> Previous</a>
+
+<div class="width100 gap10" id="prfMain">
+
+    <div class="height0 width40 col padding10 prfCard bgWhite corner30 shadow1" id="mCard">
+        <div class="height0 padding20 alignStart col relative corner20 abstractBG2">
+            <div class="height0 width0 relative corner15">
+                <img src="<%= student.photo ? student.photo : '/images/profile.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/profile.png';" class="h120 w120 corner500 borderWhite">
+                <a href="javascript:void(0)" class="nav cnav porcelain absolute left0 bottom0" id="photoBtn"><i class="fas fa-camera"></i></a>
+            </div>
+            <p class="rem2 str400"><%= student.fName %> <%= student.mName %> <%= student.lName %> <%= student.xName %></p>
+            <p class="rem14 str400"><i class="bi bi-patch-check-fill rem14"></i> <%= student.role %></p>
+
+            <div class="height0 width0 gap20 padding5 absolute top10 right10" id="controls">
+                <div class="height0 glass shadow2 width0 padding10 gap5" style="border-radius: 30px;">
+                    <% if ( student.archive === true ) { %>
+                    <a href="javascript:vod(0)" class="nav liquid corner30" id="archiveBtnX"><i class="fas fa-rotate"></i>Restore</a>
+                    <% } else { %>
+                    <a href="javascript:vod(0)" class="nav cnav liquid" id="editBtn"><i class="fas fa-pen"></i></a>
+                    <a href="javascript:vod(0)" class="nav cnav liquid" id="resetBtn"><i class="fas fa-key"></i></a>
+                    <a href="javascript:vod(0)" class="nav liquid corner30" id="archiveBtn"><i class="fas fa-archive"></i>Archive</a>
+                    <% } %>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="bgWhite col padding30 justifyStart alignStart colorPrimary relative fcrd gap5" id="info">
+            <% if (typeof messageSuccess !== 'undefined' && messageSuccess) { %>
+            <p class="bgBlue100"><i class="fas fa-exclamation-circle"></i> <%= messageSuccess %></p>
+            <br>
+            <% } %>
+            <% if (typeof messagePass !== 'undefined' && messagePass) { %>
+            <p class="bgRed100"><i class="fas fa-exclamation-circle"></i> <%= messagePass %></p>
+            <br>
+            <% } %>
+            <p class="rem12 str500"><i class="fas fa-address-card w15"></i> <%= student.schoolId ? student.schoolId : "--" %></p>
+            <p class="rem12 str500"><i class="fas fa-building w15"></i> <%= student.campus || "--" %></p>
+            <p class="rem12 str500"><i class="fas fa-envelope w15"></i> <%= student.email || "--" %></p>
+            <p class="rem12 str500"><i class="fas fa-phone w15"></i> <%= student.phone || "--" %></p>
+            <% if (student.role ==='Registrar') { %>
+                <% if (student.assign) { %>
+                    <p class="rem12 str500 bgBlue100" style="margin-top: 5px !important;">Assign to<strong class="str600 sizeInherit margin0"><%= student.assign || "--" %></strong></p>
+                <% } else { %>
+                    <p class="rem12 str500 bgBlue100" style="margin-top: 5px !important;">Unassigned</p>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="width40 height0 bgWhite corner30 padding20 col relative prfCard colorPrimary justifyStart alignStart hidden" id="photoCard">
+        <p class="rem18 str500">Change Photo</p>
+        <hr class="width70"><br>
+        <div class="bgBlue100 col alignStart">
+            <p class="rem1">Photo Upload Guidelines:</p>
+            <p class="rem1">&bull; Maximum file size: 5MB</p>
+            <p class="rem1">&bull; Allowed formats: JPG, JPEG, PNG</p>
+            <p class="rem1">&bull; Recommended dimensions: 400x400px (square)</p>
+            <p class="rem1">&bull; Clear and recognizable photo of yourself</p>
+            <p class="rem1">&bull; Avoid background clutter or dark images</p>
+        </div>
+        <br>
+        <form action="/pht4" method="POST" class="padding0" enctype="multipart/form-data">
+            <input type="hidden" name="studentId" value="<%= student._id %>">
+            <input type="hidden" name="redirectUrl" value="<%= redirectUrl  %>">
+            <div class="field">
+                <label for="photo">Upload Photo Here</label>
+                <input type="file" name="photo" id="photo" accept="image/*">
+            </div>
+                <p class="bgRed100 limitPhoto hidden marginTop10">Photo must not be larger than 500MB.</p>
+                <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                const input = document.querySelector('input[name="photo"]');
+                const warning = document.querySelector('.limitPhoto');
+
+                input.addEventListener('change', function () {
+                    warning.classList.add("hidden");
+
+                    if (this.files.length > 0) {
+                    const file = this.files[0];
+                    const maxSize = 500 * 1024 * 1024; // 500MB
+
+                    if (file.size > maxSize) {
+                        warning.textContent = "Photo must not be larger than 500MB.";
+                        warning.classList.remove("hidden");
+                        this.value = ""; // clear file input
+                    }
+                    }
+                });
+                });
+                </script>
+            <br>
+            <div class="field alignEnd">
+                <button type="submit" class="nav pnav w100">
+                    <i class="fas fa-check-circle"></i>Upload
+                </button>
+            </div>
+        </form>
+        <a href="javascript:vod(0)" class="nav cnav  top15 right15 absolute" id="closePhotoCard"><i class="fas fa-xmark"></i></a>
+    </div>
+    
+    <div class="height0 width35 col prfCard padding10 hidden" id="resetCard">
+        <div class="bgWhite col padding30 justifyStart colorPrimary relative fcrd" id="">
+            <%- include('icons/warning') %>
+            <p class="size30 str500">WARNING!</p>
+            <section class="col textCenter">
+                <p class="rem1">This will <strong>reset the user's password</strong> and generate a new one automatically. The user will receive an <strong>email</strong> containing the newly generated password.</p>
+            </section>
+            <section class="bgViolet100 col padding15 textCenter">
+                <p class="rem12">This action cannot be undone!</p>
+            </section>
+            <br>
+            <div class="section gap10">
+                <a href="javascript:vod(0)" class="nav width100"  id="closeResetCard"> Cancel</a>
+                <a href="javascript:vod(0)" class="nav cnav  top15 right15 absolute hidden"><i class="fas fa-xmark"></i></a>
+                <form action="/autoPass4" class="form2 width100">
+                    <input type="hidden" name="studentId" value="<%= student._id %>">
+                    <input type="hidden" name="redirectUrl" value="<%= redirectUrl  %>">
+                    <button type="submit" class="nav pnav width100"> Generate</a>
+                </form>
+            </div>
+            <div class="section padding0 col alignStart hidden">
+                <br>
+                -or-
+                <br><br>
+                
+                <p class="rem18 str500">Reset Password</p>
+                <hr class="width70"><br>
+                <div class="bgViolet100 col alignStart">
+                        <p class="rem1">Take Note! Password must contain the following:</p>
+                        <p class="rem1">&bull; Atleast 1 Special Character</p>
+                        <p class="rem1">&bull; Atleast 1 Upper Case Letter</p>
+                        <p class="rem1">&bull; Combination of Letter and Numbers</p>
+                        <p class="rem1">&bull; Minimum of 8 characters</p>
+                </div>
+                <br>
+                <form action="/rst4" method="POST" class="padding0 corner0 gap5">
+                    <input type="hidden" name="studentId" value="<%= student._id %>">
+                    <input type="hidden" name="redirectUrl" value="<%= redirectUrl  %>">
+                    <div class="field password width100">
+                        <label for="">Current Password</label>
+                        <input type="password" name="currentPass" id="currentPass" required>
+                        <span class="showPass" id="showPass" style="cursor: pointer;">show</span>
+                    </div>
+                    <div class="height0 col alignStart">
+                        <p class="bgGreen100 hidden" id="warning1"><i class="fas fa-check-circle"></i> Password Verified!</p>
+                        <span class="bgRed100 hidden" id="warning2"><i class="fas fa-exclamation-circle"></i> Incorrect Password!</span>
+                    </div>
+                    <div class="field password">
+                        <label for="">Create Password</label>
+                        <input type="password" name="createPass" id="createPass" required>
+                        <span class="showPass" id="showPass" style="cursor: pointer;">show</span>
+                    </div>
+                    <div class="height0 col alignStart">
+                        <p class="bgGreen100 hidden" id="warning3"><i class="fas fa-check-circle"></i> Strong Password!</p>
+                        <span class="bgRed100 hidden" id="warning4"><i class="fas fa-exclamation-circle"></i> Weak Password!</span>
+                    </div>
+                    <div class="field password">
+                        <label for="">Confirm Password</label>
+                        <input type="password" name="confirmPass" id="confirmPass" required>
+                        <span class="showPass" id="showPass" style="cursor: pointer;">show</span>
+                    </div>
+                    <div class="height0 col alignStart">
+                        <p class="bgGreen100 hidden" id="warning5"><i class="fas fa-check-circle"></i> Password Confirmed!</p>
+                        <span class="bgRed100 hidden" id="warning6"><i class="fas fa-exclamation-circle"></i> Password Didn't Matched!</span>
+                    </div>
+                    <div class="field alignEnd">
+                        <button type="submit" class="nav pnav w100"><i class="fas fa-check-circle"></i>Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+     <div class="height0 width35 col prfCard padding10 hidden" id="archiveCard">
+        <div class="bgWhite col padding30 justifyStart colorPrimary shadow2 relative fcrd" id="">
+            <%- include('icons/danger') %>
+            <p class="size30 str500">WARNING!</p>
+            <section class="col textCenter">
+                <p class="rem1">Are you sure you want to move the user to archive?</p>
+            </section>
+            <section class="bgRed100 col padding15 textCenter">
+                <p class="rem12">This action cannot be undone!</p>
+            </section>
+            <br>
+            <div class="section gap10">
+                <a href="javascript:vod(0)" class="nav width100"  id="closeArchiveCard"> Cancel</a>
+                <a href="javascript:vod(0)" class="nav cnav  top15 right15 absolute hidden"><i class="fas fa-xmark"></i></a>
+                <form action="/archive4" class="form2 width100">
+                    <input type="hidden" name="studentId" value="<%= student._id %>">
+                    <input type="hidden" name="redirectUrl" value="<%= redirectUrl  %>">
+                    <button type="submit" class="nav dnav width100"> Move</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="height0 width35 col prfCard padding10 hidden" id="archiveCardX">
+        <div class="bgWhite col padding30 justifyStart colorPrimary shadow2 relative fcrd" id="">
+            <%- include('icons/warning') %>
+            <p class="size30 str500">WARNING!</p>
+            <section class="col textCenter">
+                <p class="rem1">Are you sure you want to remove the user from archive?</p>
+            </section>
+            <section class="bgViolet100 col padding15 textCenter">
+                <p class="rem12">This action cannot be undone!</p>
+            </section>
+            <br>
+            <div class="section gap10">
+                <a href="javascript:vod(0)" class="nav width100"  id="closeArchiveCardX"> Cancel</a>
+                <a href="javascript:vod(0)" class="nav cnav  top15 right15 absolute hidden"><i class="fas fa-xmark"></i></a>
+                <form action="/archiveX4" class="form2 width100">
+                    <input type="hidden" name="studentId" value="<%= student._id %>">
+                    <input type="hidden" name="redirectUrl" value="<%= redirectUrl  %>">
+                    <button type="submit" class="nav pnav width100"> Restore</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="height0 width40 col padding10 prfCard hidden" id="editCard">
+        <div class="bgWhite col padding30 justifyStart alignStart colorPrimary relative fcrd" id="info">
+            <p class="rem18 str500">Update Contact</p>
+            <hr class="width70"><br>
+            <form id="editForm" method="POST" class="padding0 corner0 gap5">
+                <input type="hidden" name="studentId" value="<%= student._id %>">
+                <input type="hidden" name="redirectUrl" value="<%= redirectUrl %>">
+
+                <section class="padding0 gap10 alignStart">
+                    <section class="padding0 col alignStart gap5">
+
+                        <div class="field">
+                            <label>First Name</label>
+                            <input type="text" id="fName" name="fName" class="sname" value="<%= student.fName %>">
+                        </div>
+
+                        <div class="field">
+                            <label>Middle Name</label>
+                            <input type="text" id="mName" name="mName" class="sname" value="<%= student.mName %>">
+                        </div>
+
+                        <div class="field">
+                            <label>Last Name</label>
+                            <input type="text" id="lName" name="lName" class="sname" value="<%= student.lName %>">
+                        </div>
+
+                        <div class="field">
+                            <label>Ext Name</label>
+                            <input type="text" id="xName" name="xName" class="sname" value="<%= student.xName %>">
+                        </div>
+
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" id="email" name="email" value="<%= student.email %>">
+                        </div>
+
+                        <div class="bgRed100 width0 hidden" id="error">Email is already used by an existing account!</div>
+
+                        <div class="field">
+                            <label>Contact</label>
+                            <input type="text" id="phone" name="phone" class="phone" value="<%= student.phone %>">
+                        </div>
+
+                    </section>
+
+                    <section class="padding0 col alignStart gap5">
+                        
+                        <div class="field">
+                            <label>Role</label>
+                            <div class="selectBar">
+                                <select name="role" id="role">
+                                    <option disabled>Select</option>
+                                    <option value="Head" <%= student.role === "Head" ? "selected" : "" %>>Head</option>
+                                    <option value="Admin" <%= student.role === "Admin" ? "selected" : "" %>>Admin</option>
+                                    <option value="Registrar" <%= student.role === "Registrar" ? "selected" : "" %>>Registrar</option>
+                                    <option value="Accounting" <%= student.role === "Accounting" ? "selected" : "" %>>Accounting</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- CAMPUS -->
+                        <div class="field">
+                            <label>Campus</label>
+                            <div class="selectBar">
+                                <select name="campus" id="campus">
+                                    <option disabled>Select</option>
+                                    <option value="Main" <%= student.campus === "Main" ? "selected" : "" %>>Main</option>
+                                    <option value="South" <%= student.campus === "South" ? "selected" : "" %>>South</option>
+                                    <option value="San Jose" <%= student.campus === "San Jose" ? "selected" : "" %>>San Jose</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Student Number -->
+                        <div class="field">
+                            <label>Employee Number</label>
+                            <input type="text" id="schoolId" name="schoolId" value="<%= student.schoolId %>">
+                        </div>
+
+                        <div class="bgRed100 width0 hidden" id="error2">Employee number is already registered!</div>
+                        <br>
+                        
+                        <%
+                        const ASSIGN_OPTIONS = [
+                        { code: "CAS", label: "CAS" },
+                        { code: "CELA", label: "CELA" },
+                        { code: "CMA", label: "CMA" },
+                        { code: "COE", label: "COE" },
+                        { code: "CIT", label: "CIT" },
+                        { code: "CAHS", label: "CAHS" },
+                        { code: "CCJE", label: "CCJE" },
+                        { code: "OLD", label: "OLD" },
+                        { code: "San Jose", label: "San Jose" },
+                        { code: "South", label: "South" }
+                        ];
+                        %>
+                        <div class="field gap5 height0">
+                            <label for="">Assign*</label>
+                            <div class="selectBar">
+                                <select name="assign" id="assign" required>
+                                <option value="" disabled>Select</option>
+                                <% ASSIGN_OPTIONS.forEach(opt => { %>
+                                    <option
+                                    value="<%= opt.code %>"
+                                    <%= student.assign === opt.code ? "selected" : "" %>>
+                                    <%= opt.label %>
+                                    </option>
+                                <% }) %>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field alignEnd">
+                            <button type="submit" class="nav pnav w100">
+                                <i class="fas fa-check-circle"></i> Update
+                            </button>
+                        </div>
+
+                    </section>
+                </section>
+            </form>
+            <a href="javascript:vod(0)" class="nav cnav  top15 right15 absolute" id="closeEditCard"><i class="fas fa-xmark"></i></a>
+        </div>
+    </div>
+    
+    <div class="height0 width35 col prfCard bgWhite corner30 shadow1 relative hidden"  id="idCard">
+            <img src="<%= student.vId ? student.vId : '/images/annPhoto2.png' %>" alt="Profile" onerror="this.onerror=null; this.src='/images/annPhoto2.png';" class="width100">
+            <a href="javascript:vod(0)" class="nav cnav  top15 right15 absolute" id="closeIdCard"><i class="fas fa-xmark"></i></a>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById('editForm');
+    form.action = '/edt4'; // set dynamically
+});
+</script>
+<script>
+  const mCard = document.getElementById('mCard');
+
+  // Map each card to its button and close button
+  const cards = [
+    { card: 'resetCard', open: 'resetBtn', close: 'closeResetCard' },
+    { card: 'editCard', open: 'editBtn', close: 'closeEditCard' },
+    { card: 'photoCard', open: 'photoBtn', close: 'closePhotoCard' },
+    { card: 'archiveCard', open: 'archiveBtn', close: 'closeArchiveCard' },
+    { card: 'archiveCardX', open: 'archiveBtnX', close: 'closeArchiveCardX' }
+  ];
+
+  function hideAllCards() {
+    cards.forEach(c => {
+      const cardEl = document.getElementById(c.card);
+      if (cardEl) cardEl.classList.add('hidden');
+    });
+    mCard.classList.add('hidden'); // hide main card when any card opens
+  }
+
+  function showMainCard() {
+    mCard.classList.remove('hidden');
+  }
+
+  // Set up event listeners for all cards, only if elements exist
+  cards.forEach(c => {
+    const cardEl = document.getElementById(c.card);
+    const openBtn = document.getElementById(c.open);
+    const closeBtn = document.getElementById(c.close);
+
+    if (cardEl && openBtn) {
+      openBtn.addEventListener('click', () => {
+        hideAllCards();
+        cardEl.classList.remove('hidden');
+      });
+    }
+
+    if (cardEl && closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        cardEl.classList.add('hidden');
+        showMainCard();
+      });
+    }
+  });
+</script>
+
+
+<script>
+    const currentPass = document.getElementById('currentPass');
+    const warning1 = document.getElementById('warning1'); // correct
+    const warning2 = document.getElementById('warning2'); // incorrect
+
+    const createPass = document.getElementById('createPass');
+    const warning3 = document.getElementById('warning3'); // strong
+    const warning4 = document.getElementById('warning4'); // weak
+
+    const confirmPass = document.getElementById('confirmPass');
+    const warning5 = document.getElementById('warning5'); // matched
+    const warning6 = document.getElementById('warning6'); // not matched
+
+
+    // 1. CHECK CURRENT PASSWORD (LIVE)
+    currentPass.addEventListener('keyup', function () {
+        fetch('/check-pass4', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                currentPass: this.value,
+                studentId: "<%= student._id %>" // pass the viewed student's ID
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (this.value === "") {
+                warning1.classList.add('hidden');
+                warning2.classList.add('hidden');
+                return;
+            }
+
+            if (data.valid) {
+                warning1.classList.remove('hidden');
+                warning2.classList.add('hidden');
+            } else {
+                warning2.classList.remove('hidden');
+                warning1.classList.add('hidden');
+            }
+        });
+    });
+
+
+    // 2. CHECK NEW PASSWORD STRENGTH
+    createPass.addEventListener('keyup', function () {
+        const pass = this.value;
+
+        const hasUpper = /[A-Z]/.test(pass);
+        const hasSpecial = /[\W_]/.test(pass);
+        const hasNumber = /\d/.test(pass);
+        const longEnough = pass.length >= 8;
+
+        if (pass === "") {
+            warning3.classList.add('hidden');
+            warning4.classList.add('hidden');
+            return;
+        }
+
+        if (hasUpper && hasSpecial && hasNumber && longEnough) {
+            warning3.classList.remove('hidden'); // strong
+            warning4.classList.add('hidden');
+        } else {
+            warning4.classList.remove('hidden'); // weak
+            warning3.classList.add('hidden');
+        }
+    });
+
+
+    // 3. CONFIRM PASSWORD MATCH
+    confirmPass.addEventListener('keyup', function () {
+        if (this.value === "") {
+            warning5.classList.add('hidden');
+            warning6.classList.add('hidden');
+            return;
+        }
+
+        if (this.value === createPass.value) {
+            warning5.classList.remove('hidden');
+            warning6.classList.add('hidden');
+        } else {
+            warning6.classList.remove('hidden');
+            warning5.classList.add('hidden');
+        }
+    });
+
+</script>
+
+
+<script>
+    function enforceNumericInput(event) {
+        event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const phoneInputs = document.querySelectorAll('.phone');
+        phoneInputs.forEach(input => {
+            input.addEventListener('input', enforceNumericInput);
+        });
+    });
+</script>
+
+                        
+<script>
+    const currentEmail = "<%= student.email %>";
+
+    document.getElementById('email').addEventListener('input', function () {
+        const email = this.value;
+
+        fetch(`/check-email2?email=${encodeURIComponent(email)}&current=${encodeURIComponent(currentEmail)}`)
+            .then(response => response.json())
+            .then(data => {
+                const errorMsg = document.getElementById('error');
+                if (data.exists) {
+                    errorMsg.classList.remove('hidden');
+                } else {
+                    errorMsg.classList.add('hidden');
+                }
+            });
+    });
+</script>
+<script>
+const currentSchoolId = "<%= student.schoolId %>";
+
+document.getElementById('schoolId').addEventListener('input', function () {
+    const schoolId = this.value;
+
+    fetch(`/check2-schoolId?schoolId=${encodeURIComponent(schoolId)}&current=${encodeURIComponent(currentSchoolId)}`)
+        .then(response => response.json())
+        .then(data => {
+            const errorMsg = document.getElementById('error2');
+            if (data.exists) {
+                errorMsg.classList.remove('hidden');
+            } else {
+                errorMsg.classList.add('hidden');
+            }
+        });
+});
+</script>
+
