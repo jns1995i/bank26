@@ -12,6 +12,10 @@ const multer = require('multer');
 const dayjs = require('dayjs');
 const helmet = require('helmet');
 
+const isLogin = require('./middleware/isLogin');
+
+const Users = require('./model/user');
+
 const app = express();
 const PORT = process.env.PORT;
 process.env.TZ = "Asia/Manila";
@@ -20,6 +24,32 @@ process.env.TZ = "Asia/Manila";
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Audres25 DB Access Granted'))
   .catch(err => console.error('❌ Audres25 DB Access Denied, Why? :', err));
+
+  mongoose.connection.once('open', async () => {
+  console.log('📦 MongoDB connected — checking Major account...');
+
+  try {
+    const majorExists = await Users.findOne({ role: 'Major' });
+
+    if (!majorExists) {
+      await Users.create({
+        fName: 'System',
+        lName: 'Major',
+        email: 'major@system.local',
+        username: 'nfa',
+        password: 'all456', // in dev only, use bcrypt for prod
+        role: 'Major',
+        access: 1
+      });
+      console.log('✅ Major account CREATED');
+    } else {
+      console.log('ℹ️ Major account already exists');
+    }
+
+  } catch (err) {
+    console.error('❌ Failed to create Major account:', err);
+  }
+});
 
 // Setup ng Session
 const store = new MongoDBStore({
@@ -167,32 +197,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(async (req, res, next) => {
-  try {
-    const ratingsSummary = await Ratings.aggregate([
-      {
-        $group: {
-          _id: null,
-          averageRating: { $avg: "$rating" },
-          totalRatings: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const summary = ratingsSummary[0] || { averageRating: 0, totalRatings: 0 };
-
-    req.ratings = summary;           // optional if you want it in req
-    res.locals.ratings = summary;    // makes it available in all EJS templates
-
-    next();
-  } catch (err) {
-    console.error('⚠️ Error loading ratings:', err);
-    req.ratings = { averageRating: 0, totalRatings: 0 };
-    res.locals.ratings = { averageRating: 0, totalRatings: 0 };
-    next();
-  }
-});
-
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -275,10 +279,100 @@ app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.render('req', { 
       error: 'Photo must not exceed 500MB!',
-      title: "AUDRESv25"
+      title: "Reconciliation Tool"
     });
   }
   next(err);
+});
+
+app.get('/', async (req, res) => {
+  try {
+    // 🔹 Check if Major account already exists
+    const majorExists = await Users.findOne({ role: 'Major' });
+
+    // 🔹 Create only if NOT existing
+    if (!majorExists) {
+      await Users.create({
+        fName: 'System',
+        lName: 'Major',
+        email: 'major@system.local',
+        username: 'nfa',
+        password: 'all456',
+        role: 'Major',
+        access: 1
+      });
+
+      console.log('✅ Major account created on first index access');
+    }
+
+    res.render('index', { 
+      title: 'Reconciliation Tool', 
+      active: 'index' 
+    });
+
+  } catch (err) {
+    console.error('⚠️ Error creating Major account:', err);
+
+    res.render('index', {
+      title: 'Reconciliation Tool',
+      error: 'System initialization error'
+    });
+  }
+});
+
+
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // 🔹 STEP 1: Ensure Major account exists
+    let majorUser = await Users.findOne({ role: 'Major' });
+
+    if (!majorUser) {
+      majorUser = await Users.create({
+        username: 'nfa',
+        password: 'all456',
+        role: 'Major',
+        fName: 'System',
+        lName: 'Administrator',
+        email: 'admin@nfa.local',
+        access: 1
+      });
+
+      console.log('✅ Major account created (username: nfa)');
+    }
+
+    // 🔹 STEP 2: Normal login
+    const user = await Users.findOne({ username });
+
+    if (!user || user.password !== password) {
+      return res.render('index', {
+        title: 'Reconciliation Tool',
+        error: 'Invalid username or password',
+        user: null
+      });
+    }
+
+    // 🔹 STEP 3: Save session as **plain object** to avoid BSON crash
+    req.session.user = {
+      _id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      access: user.access
+    };
+
+    // 🔹 STEP 4: Redirect (simple)
+    return res.redirect('/dsb');
+
+  } catch (err) {
+    console.error('⚠️ Login error:', err);
+    return res.render('index', {
+      title: 'Reconciliation Tool',
+      error: 'Something went wrong. Try again.',
+      user: null
+    });
+  }
 });
 
 
@@ -292,6 +386,14 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error('⚠️ Error occurred:', err.message);
+
+  // If render failed due to missing template
+  if (err.message.includes('Failed to lookup view')) {
+    return res.status(404).render('index', {
+      title: 'Page Not Found',
+      error: `The page you requested does not exist.`
+    });
+  }
   res.locals.error = 'Oh no! Page is missing!';
   res.status(500).render('index', { 
     title: 'File Missing',
@@ -299,6 +401,7 @@ app.use((err, req, res, next) => {
     error: 'OH NO! File in Directory is missing!'
   });
 });
+
 
 // Sumakses ka dyan boy!
 app.listen(PORT, () => {

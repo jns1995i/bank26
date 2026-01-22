@@ -7,11 +7,45 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <title>Document</title>
-    <link rel="icon" href="/images/au.png">
+    <title><%= title %></title>
+    <link rel="icon" href="/images/logo.png">
     <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-    
+<body class="polaroid">
+
+    <section class="width60 col">
+        <img src="/images/logo.png" alt="" class="h200">
+        <p class="size60">Web-Based Bank</p>
+        <p class="size60 marginTop40n">Reconciliation Tool</p>
+    </section>
+    <section class="width40">
+        <form action="/login" method="POST" class="width80 shadow2 height0 gap15">
+            <div class="field alignCenter">
+                <p class="size30 colorPrimary str500">Welcome Admin</p>
+            </div>
+            <div class="height0 col">
+                <% if (error) { %>
+                <span style="color: red;" class="noteRed"><%= error %></span>
+                <% } else { %>
+                <% } %>
+            </div>
+            <div class="field">
+                <label for="">Username</label>
+                <input type="text" name="username" placeholder="Enter your username">
+            </div>
+            <div class="field password">
+                <label for="">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <span class="showPass" id="showPass" style="cursor: pointer;">show</span>
+            </div>
+            <div class="field">
+                <button type="submit" class="nav bgRed700 width100 white">Login</button>
+            </div>
+            <a href="">Forgot Password</a>
+        </form>
+    </section>
+
+    <script src="/script/showPassword.js"></script>
+
 </body>
 </html>
