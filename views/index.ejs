@@ -18,15 +18,14 @@
         <p class="size60">Web-Based Bank</p>
         <p class="size60 marginTop40n">Reconciliation Tool</p>
     </section>
-    <section class="width40">
-        <form action="/login" method="POST" class="width80 shadow2 height0 gap15">
-            <div class="field alignCenter">
-                <p class="size30 colorPrimary str500">Welcome Admin</p>
-            </div>
-            <div class="height0 col">
+    <section class="width40 justifyStart">
+        <form action="/login" method="POST" class="width80 shadow2 height0 gap15 corner20">
+            <div class="height0 col gap5">
                 <% if (error) { %>
+                <p class="size26 colorPrimary str500">Welcome Admin</p>
                 <span style="color: red;" class="noteRed"><%= error %></span>
                 <% } else { %>
+                <p class="size30 colorPrimary str500">Welcome Admin</p>
                 <% } %>
             </div>
             <div class="field">

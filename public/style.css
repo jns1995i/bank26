@@ -420,12 +420,12 @@ main {
     border-radius: 1.5rem;
     color: white;
     background: 
-        radial-gradient(circle at 70% 10%, var(--tint10), transparent 80%),  /* Light Gray */
+        radial-gradient(circle at 70% 60%, var(--tint14), transparent 60%),  /* Light Gray */
         radial-gradient(circle at 88% 99%,  var(--tint9), transparent 26%),  /* Very Light Blue */
         radial-gradient(circle at 20% 1%,  var(--blue900), transparent 70%); /* White */
     background-blend-mode: multiply;
     backdrop-filter: blur(50px);
-    background-color: var(--tint12);
+    background-color: var(--tint9);
 }
 .mainf {
     width: 85%;
@@ -1195,7 +1195,7 @@ progress::-moz-progress-bar { background-color: #4caf50; }
         radial-gradient(circle at 20% 1%,  var(--blue900), transparent 70%); /* White */
     background-blend-mode: multiply;
     backdrop-filter: blur(50px);
-    background-color: transparent;
+    background-color: var(--tint12);
 }
 
 .geo {
