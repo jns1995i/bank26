@@ -1,0 +1,43 @@
+{
+  "name": "bank26",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/jns1995i/bank26#readme",
+  "bugs": {
+    "url": "https://github.com/jns1995i/bank26/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jns1995i/bank26.git"
+  },
+  "license": "ISC",
+  "author": "Ferry",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+  "start": "node sys.js",
+  "dev": "nodemon sys.js"
+},
+  "dependencies": {
+    "cloudinary": "^1.41.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongodb-session": "^5.0.0",
+    "dayjs": "^1.11.19",
+    "dotenv": "^17.2.3",
+    "ejs": "^4.0.1",
+    "ejs-mate": "^4.0.0",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "mongoose": "^9.1.5",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
