@@ -1,0 +1,31 @@
+<% layout('layout') %>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Reason</th>
+      <th>Company ID</th>
+      <th>Bank ID</th>
+      <th>Amount</th>
+      <th>Dump</th>
+      <th>Created At</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (excepts && excepts.length) { %>
+      <% excepts.forEach(e => { %>
+        <tr>
+          <td><%= e.type %></td>
+          <td><%= e.reason %></td>
+          <td><%= e.companyId || '—' %></td>
+          <td><%= e.bankId || '—' %></td>
+          <td><%= e.amount.toLocaleString() %></td>
+          <td><%= e.dump ? 'Yes' : 'No' %></td>
+          <td><%= e.createdAtFormatted %> (<%= e.createdAtAgo %>)</td>
+        </tr>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="7">No exceptions found.</td></tr>
+    <% } %>
+  </tbody>
+</table>

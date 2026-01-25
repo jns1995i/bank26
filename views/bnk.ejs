@@ -1,0 +1,29 @@
+<% layout('layout') %>
+<table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Dump</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (bankTrs && bankTrs.length > 0) { %>
+        <% bankTrs.forEach(tr => { %>
+          <tr>
+            <td><%= tr.dateFormatted %> (<%= tr.dateAgo %>)</td>
+            <td><%= tr.desc %></td>
+            <td><%= tr.amount.toLocaleString() %></td>
+            <td><%= tr.type %></td>
+            <td><%= tr.dump ? 'Yes' : 'No' %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="5">No bank transactions found.</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>

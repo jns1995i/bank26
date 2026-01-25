@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <title><%= title %></title>
+    <link rel="icon" href="/images/logo.png">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <div class="sidef">
+        <div class="height15 geo corner15">
+            <img src="/images/logo.png" alt="" class="h75">
+        </div>
+        <div class="menu height75">
+            <p class="size14">Menu</p>
+            <hr class="marginBottom5">
+            <a href="/dsb" class="nav mnav <% if ( active === 'dsb') { %> active liquid <% } %>">Dashboard</a>
+            <a href="/rec" class="nav mnav <% if ( active === 'rec') { %> active liquid <% } %>">Reconciliation</a>
+            <a href="/bnk" class="nav mnav <% if ( active === 'bnk') { %> active liquid <% } %>">Bank</a>
+            <a href="/dep" class="nav mnav <% if ( active === 'dep') { %> active liquid <% } %>">Deposit</a>
+            <a href="/out" class="nav mnav <% if ( active === 'out') { %> active liquid <% } %>">Outstanding</a>
+            <a href="/rpt" class="nav mnav <% if ( active === 'rpt') { %> active liquid <% } %>">Reports</a>
+        </div>
+        <div class="height10 justifyBetween alignEnd">
+            <a href="/" class="nav glass width100 borderWhite corner10">Log Out<i class="fas fa-sign-out"></i></a>
+        </div>
+    </div>
+    <div class="mainf">
+        <%- body %>
+    </div>
+    
+</body>
+</html>

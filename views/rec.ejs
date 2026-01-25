@@ -1,0 +1,33 @@
+<% layout('layout') %>
+<table>
+  <thead>
+    <tr>
+      <th>Date Generated</th>
+      <th>Bank Balance</th>
+      <th>Company Balance</th>
+      <th>Total Outstanding</th>
+      <th>Total Deposit</th>
+      <th>Adjusted Balance</th>
+      <th>Difference</th>
+      <th>Dump</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (recos && recos.length) { %>
+      <% recos.forEach(r => { %>
+        <tr>
+          <td><%= r.dateGeneratedFormatted %> (<%= r.dateGeneratedAgo %>)</td>
+          <td><%= r.bankBalance.toLocaleString() %></td>
+          <td><%= r.companyBalance.toLocaleString() %></td>
+          <td><%= r.totalOutstanding.toLocaleString() %></td>
+          <td><%= r.totalDeposit.toLocaleString() %></td>
+          <td><%= r.adjustedBalance.toLocaleString() %></td>
+          <td><%= r.difference.toLocaleString() %></td>
+          <td><%= r.dump ? 'Yes' : 'No' %></td>
+        </tr>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="8">No reconciliation reports found.</td></tr>
+    <% } %>
+  </tbody>
+</table>

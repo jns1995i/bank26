@@ -13,7 +13,19 @@ const dayjs = require('dayjs');
 const helmet = require('helmet');
 
 const isLogin = require('./middleware/isLogin');
+const isTr = require('./middleware/isTr');
+const isBankTr = require('./middleware/isBankTr');
+const isDeposit = require('./middleware/isDeposit');
+const isOut = require('./middleware/isOut');
+const isExcept = require('./middleware/isExcept');
+const isReco = require('./middleware/isReco');
 
+const Tr = require('./model/tr');
+const BankTr = require('./model/banktr');
+const Deposit = require('./model/deposit');
+const Out = require('./model/out');
+const Except = require('./model/except');
+const Reco = require('./model/reco');
 const Users = require('./model/user');
 
 const app = express();
@@ -378,6 +390,41 @@ app.post('/login', async (req, res) => {
 
 app.get('/dsb', isLogin, async (req, res) => {
   res.render('dsb', { title: 'Dashboard', active: 'dsb' });
+});
+
+// Bank Transactions
+app.get('/bnk', isLogin, isBankTr, async (req, res) => {
+  res.render('bnk', { title: 'Bank Transactions', active: 'bnk' });
+});
+
+// Reconciliation Reports
+app.get('/trs', isLogin, isTr, async (req, res) => {
+  res.render('trs', { title: 'Company Transactions', active: 'trs' });
+});
+
+// Deposits
+app.get('/dep', isLogin, isDeposit, async (req, res) => {
+  res.render('dep', { title: 'Deposits', active: 'dep' });
+});
+
+// Outstanding Checks
+app.get('/out', isLogin, isOut, async (req, res) => {
+  res.render('out', { title: 'Outstanding Checks', active: 'out' });
+});
+
+// Exceptions
+app.get('/exc', isLogin, isExcept, async (req, res) => {
+  res.render('exc', { title: 'Exceptions', active: 'exc' });
+});
+
+// Reconciliation Reports
+app.get('/rec', isLogin, isReco, async (req, res) => {
+  res.render('rec', { title: 'Reconciliation Reports', active: 'rec' });
+});
+
+// Reconciliation Reports
+app.get('/rpt', isLogin, async (req, res) => {
+  res.render('rpt', { title: 'Reports', active: 'rpt' });
 });
 
 

@@ -1,0 +1,29 @@
+<% layout('layout') %>
+<table>
+  <thead>
+    <tr>
+      <th>Check No</th>
+      <th>Issued At</th>
+      <th>Payee</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Dump</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (outs && outs.length) { %>
+      <% outs.forEach(o => { %>
+        <tr>
+          <td><%= o.checkNo %></td>
+          <td><%= o.issuedAtFormatted %> (<%= o.issuedAtAgo %>)</td>
+          <td><%= o.payee %></td>
+          <td><%= o.amount.toLocaleString() %></td>
+          <td><%= o.status %></td>
+          <td><%= o.dump ? 'Yes' : 'No' %></td>
+        </tr>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="6">No outstanding checks found.</td></tr>
+    <% } %>
+  </tbody>
+</table>

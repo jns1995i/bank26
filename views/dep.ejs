@@ -1,0 +1,27 @@
+<% layout('layout') %>
+<table>
+  <thead>
+    <tr>
+      <th>Date Deposited</th>
+      <th>Source</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Dump</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (deposits && deposits.length) { %>
+      <% deposits.forEach(d => { %>
+        <tr>
+          <td><%= d.dateDepositedFormatted %> (<%= d.dateDepositedAgo %>)</td>
+          <td><%= d.source %></td>
+          <td><%= d.amount.toLocaleString() %></td>
+          <td><%= d.status %></td>
+          <td><%= d.dump ? 'Yes' : 'No' %></td>
+        </tr>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="5">No deposits found.</td></tr>
+    <% } %>
+  </tbody>
+</table>
