@@ -5,6 +5,25 @@ const trSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  // 1. ADD: The Fund/Account type (GOF, CPF, RCA, MSC)
+  accountType: {
+    type: String,
+    enum: ['GOF', 'CPF', 'RCA', 'MSC'],
+    required: true
+  },
+
+  // 2. ADD: The Check Number for matching
+  checkNo: {
+    type: String,
+    trim: true,
+    default: "" // Some entries like "Interest" might not have a check number
+  },
+
+  // 3. ADD: The Voucher Number for internal tracking
+  voucherNo: {
+    type: String,
+    trim: true
+  },
 
   desc: {
     type: String,

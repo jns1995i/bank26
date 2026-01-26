@@ -6,7 +6,6 @@
         <th>Description</th>
         <th>Amount</th>
         <th>Type</th>
-        <th>Dump</th>
       </tr>
     </thead>
     <tbody>
@@ -17,7 +16,6 @@
             <td><%= tr.desc %></td>
             <td><%= tr.amount.toLocaleString() %></td>
             <td><%= tr.type %></td>
-            <td><%= tr.dump ? 'Yes' : 'No' %></td>
           </tr>
         <% }) %>
       <% } else { %>

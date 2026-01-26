@@ -1,27 +1,38 @@
 <% layout('layout') %>
-<table>
+
+
+<h2>Book Transactions (Internal Ledger)</h2>
+
+<br>
+
+<table cellpadding="10">
   <thead>
-    <tr>
+    <tr style="background-color: #f2f2f2;">
       <th>Date</th>
-      <th>Description</th>
+      <th>Fund</th> <th>Voucher No.</th> <th>Check No.</th> <th>Description/Payee</th>
       <th>Amount</th>
       <th>Type</th>
-      <th>Dump</th>
-    </tr>
+      <th>Status</th> </tr>
   </thead>
   <tbody>
     <% if (trs && trs.length) { %>
       <% trs.forEach(tr => { %>
         <tr>
-          <td><%= tr.dateFormatted %> (<%= tr.dateAgo %>)</td>
+          <td><%= tr.dateFormatted %></td>
+          <td><strong><%= tr.accountType %></strong></td> <td><%= tr.voucherNo || 'N/A' %></td>
+          <td><%= tr.checkNo || '---' %></td>
           <td><%= tr.desc %></td>
-          <td><%= tr.amount.toLocaleString() %></td>
+          <td><%= tr.amount.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></td>
           <td><%= tr.type %></td>
-          <td><%= tr.dump ? 'Yes' : 'No' %></td>
+          <td>
+             <span class="<%= tr.status === 'Reconciled' ? 'noteGreen' : 'noteGray' %>">
+               <%= tr.status %>
+             </span>
+          </td>
         </tr>
       <% }) %>
     <% } else { %>
-      <tr><td colspan="5">No transactions found.</td></tr>
+      <tr><td colspan="8" style="text-align:center;">No transactions found.</td></tr>
     <% } %>
   </tbody>
 </table>

@@ -428,6 +428,39 @@ app.get('/rpt', isLogin, async (req, res) => {
 });
 
 
+// Change '/transactions' to '/trs' to match your existing GET route
+app.post('/newTR', isLogin, isTr, async (req, res) => {
+  try {
+    const { date, accountType, voucherNo, checkNo, desc, amount, type } = req.body;
+
+    const newTr = new Tr({
+      date,
+      accountType,
+      voucherNo,
+      checkNo,
+      desc,
+      amount,
+      type,
+      status: 'Recorded', // Default for new entries
+      dump: false         // Real data
+    });
+
+    await newTr.save();
+    
+    // Use req.flash if you want to show a success message
+    // req.flash('messageSuccess', 'Transaction saved successfully!'); 
+    res.redirect('/trs'); // Redirect back to the table view
+  } catch (err) {
+    console.error('❌ Save Error:', err);
+    res.status(500).render('trs', { 
+      title: 'Company Transactions', 
+      error: 'Failed to save record. Check your inputs.' 
+    });
+  }
+});
+
+
+
 
 app.use((req, res) => {
   res.status(404);

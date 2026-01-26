@@ -15,25 +15,93 @@
 
     <div class="sidef">
         <div class="height15 geo corner15">
-            <img src="/images/logo.png" alt="" class="h75">
+            <img src="/images/logo.png" alt="" class="hpx75">
         </div>
-        <div class="menu height75">
+        <div class="menu height70">
             <p class="size14">Menu</p>
             <hr class="marginBottom5">
             <a href="/dsb" class="nav mnav <% if ( active === 'dsb') { %> active liquid <% } %>">Dashboard</a>
             <a href="/rec" class="nav mnav <% if ( active === 'rec') { %> active liquid <% } %>">Reconciliation</a>
             <a href="/bnk" class="nav mnav <% if ( active === 'bnk') { %> active liquid <% } %>">Bank</a>
-            <a href="/dep" class="nav mnav <% if ( active === 'dep') { %> active liquid <% } %>">Deposit</a>
-            <a href="/out" class="nav mnav <% if ( active === 'out') { %> active liquid <% } %>">Outstanding</a>
-            <a href="/rpt" class="nav mnav <% if ( active === 'rpt') { %> active liquid <% } %>">Reports</a>
+            <a href="/trs" class="nav mnav <% if ( active === 'trs') { %> active liquid <% } %>">Transactions</a>
+            <a href="/dep" class="hidden nav mnav <% if ( active === 'dep') { %> active liquid <% } %>">Deposit</a>
+            <a href="/out" class="hidden nav mnav <% if ( active === 'out') { %> active liquid <% } %>">Outstanding</a>
+            <a href="/rpt" class="hidden nav mnav <% if ( active === 'rpt') { %> active liquid <% } %>">Reports</a>
         </div>
-        <div class="height10 justifyBetween alignEnd">
+        <div class="menu height15 justifyEnd">
+            <a href="/" class="nav mnav liquid <% if ( active === '') { %> active liquid <% } %>">Profile</a>
+            <a href="/" class="nav mnav liquid width100 <% if ( active === '') { %> active liquid <% } %>"><i class="fas fa-sign-out"></i> Logout</a>
+        </div>
+        <div class="height10 justifyBetween alignEnd hidden">
             <a href="/" class="nav glass width100 borderWhite corner10">Log Out<i class="fas fa-sign-out"></i></a>
         </div>
     </div>
     <div class="mainf">
         <%- body %>
     </div>
+
+
+<% if ( active === 'trs') { %>
+<div class="width30 col fixed right0 bgWhite shadow2 justifyStart padding20">
+    <form action="/newTR" method="POST" class="height0 col gap10">
+
+        <div class="field">
+            <p class="size30 medium">Add New Record</p>
+        </div>
+
+        <div class="field">
+            <label for="">Date</label>
+            <input type="date" name="date" required>
+        </div>
+
+        <div class="field">
+            <label for="">Account / Fund Type</label>
+            <div class="selectBar">
+                <select name="accountType" required style="width: 100%; padding: 8px;">
+                <option value="">-- Select Fund --</option>
+                <option value="GOF">GOF (General Operating Fund)</option>
+                <option value="CPF">CPF (Corporate Partnership Fund)</option>
+                <option value="RCA">RCA (Rice Collection Account)</option>
+                <option value="MSC">MSC (Miscellaneous)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="">Voucher No.</label>
+          <input type="text" name="voucherNo" placeholder="e.g. 25-11-1496" style="width: 100%; padding: 8px;">
+        </div>
+        <div class="field">
+            <label for="">Check No.</label>
+          <input type="text" name="checkNo" placeholder="e.g. 1723917" style="width: 100%; padding: 8px;">
+        </div>
+        <div class="field">
+            <label for="">Description / Remarks</label>
+            <textarea name="desc" required placeholder="Who was paid and for what?" style="width: 100%; padding: 8px;"></textarea>
+        </div>
+        <div class="field">
+            <label for="">Amount</label>
+          <input type="number" name="amount" step="0.01" required placeholder="0.00" style="width: 100%; padding: 8px;">
+        </div>
+        <div class="field">
+            <label for="">Entry Type:</label>
+            <div class="selectBar">
+                <select name="type" required style="width: 100%; padding: 8px;">
+                    <option value="Debit">Debit (Disbursement)</option>
+                    <option value="Credit">Credit (Collection)</option>
+                </select>
+            </div>
+        </div>
+
+        <section class="justifyBetween padding0">
+            <a href="" class="nav width20">Cancel</a>
+            <button class="nav width20 pnav" type="submit">Add to Record</button>
+        </section>
+
+    </form>
+
+</div>
+<% } %>   
     
 </body>
 </html>

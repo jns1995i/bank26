@@ -1455,6 +1455,11 @@ progress::-moz-progress-bar { background-color: #4caf50; }
   100% { background-position: 0% 50%; }
 }
 
+
+.glowImg { filter: drop-shadow(0 0 1px #ffffff43) drop-shadow(0 0 10px var(--radial3)) drop-shadow(0 0 5px #ffffff46); transition: filter 0.3s ease; }
+.glowImg2 { filter: drop-shadow(0 0 6px #ffffff21) drop-shadow(0 0 6px #ffffff21) drop-shadow(0 0 5px #ffffff46); transition: filter 0.3s ease; }
+.glowImg3 { filter: drop-shadow(0 0 1px #ffffff15) drop-shadow(0 0 2px #ffffff17) drop-shadow(0 0 2px #ffffff28); transition: filter 0.3s ease; }
+
 .bell {
     position: relative;
     width: 105px;
@@ -11428,6 +11433,16 @@ p + p {
 .str800 { font-weight: 800; }
 .str900 { font-weight: 900; }
 
+.extraLight { font-weight: 100; }
+.light { font-weight: 200; }
+.semiLight { font-weight: 300; }
+.normal { font-weight: 400; }
+.medium { font-weight: 500; }
+.semiBold { font-weight: 600; }
+.bold { font-weight: 700; }
+.extraBold { font-weight: 800; }
+.strong { font-weight: 900; }
+
 .opacity0 { opacity: 0; }
 .opacity01 { opacity: 0.01; }
 .opacity05 { opacity: 0.05; }
@@ -11884,33 +11899,30 @@ p + p {
 
 /* General Overflow */
 .overflow0 { overflow: hidden; }
-.overflow1 { overflow: auto; }
-.overflow2 { overflow: scroll; }
-.overflow3 { overflow: visible; }
+.overflow { overflow: auto; }
+.overflowScroll { overflow: scroll; }
+.overflowVisible { overflow: visible; }
 
 /* Overflow-Y */
-.overflow-y0 { overflow-y: hidden; }
-.overflow-y1 { overflow-y: auto; }
-.overflow-y2 { overflow-y: scroll; }
-.overflow-y3 { overflow-y: visible; }
+.overflowY0 { overflow-y: hidden; }
+.overflowY { overflow-y: auto; }
+.overflowYScroll { overflow-y: scroll; }
+.overflowYVisible { overflow-y: visible; }
 
 /* Overflow-X */
-.overflow-x0 { overflow-x: hidden; }
-.overflow-x1 { overflow-x: auto; }
-.overflow-x2 { overflow-x: scroll; }
-.overflow-x3 { overflow-x: visible; }
+.overflowX0 { overflow-x: hidden; }
+.overflowX { overflow-x: auto; }
+.overflowXScroll { overflow-x: scroll; }
+.overflowXVisible { overflow-x: visible; }
 
 .transition { transition: all 0.6s ease-in-out; }
 .transition0 { transition: none; }
 
 /* Shadows */
+.shadow0 { box-shadow: none; }
 .shadow1 { box-shadow: var(--shadow1); }
 .shadow2 { box-shadow: var(--shadow2); }
 .shadow3 { box-shadow: var(--shadow3); }
-.shadowNone { box-shadow: none; }
-.glowImg { filter: drop-shadow(0 0 1px #ffffff43) drop-shadow(0 0 10px var(--radial3)) drop-shadow(0 0 5px #ffffff46); transition: filter 0.3s ease; }
-.glowImg2 { filter: drop-shadow(0 0 6px #ffffff21) drop-shadow(0 0 6px #ffffff21) drop-shadow(0 0 5px #ffffff46); transition: filter 0.3s ease; }
-.glowImg3 { filter: drop-shadow(0 0 1px #ffffff15) drop-shadow(0 0 2px #ffffff17) drop-shadow(0 0 2px #ffffff28); transition: filter 0.3s ease; }
 
 .index0 { z-index: 0; }
 .index1 { z-index: 1; }
