@@ -347,8 +347,8 @@ app.get('/dsb', isLogin, async (req, res) => {
 });
 
 // Bank Transactions
-app.get('/bnk', isLogin, isBankTr, async (req, res) => {
-  res.render('bnk', { title: 'Financial Entries', active: 'bnk' });
+app.get('/knb', isLogin, isBankTr, async (req, res) => {
+  res.render('knb', { title: 'Financial Entries', active: 'knb' });
 });
 
 // Reconciliation Reports
@@ -546,10 +546,10 @@ app.post('/newBNK', isLogin, isBankTr, async (req, res) => {
 
     await newBankTr.save();
     
-    res.redirect('/bnk');
+    res.redirect('/knb');
   } catch (err) {
     console.error(err);
-    res.redirect('/bnk');
+    res.redirect('/knb');
   }
 });
 
@@ -608,7 +608,7 @@ app.post('/editBNK', isLogin, async (req, res) => {
       type
     });
 
-    res.redirect('/bnk');
+    res.redirect('/knb');
   } catch (err) {
     console.error('❌ Update Bank Error:', err);
     res.status(500).send('Failed to update bank transaction');
@@ -620,7 +620,7 @@ app.post('/deleteBNK', isLogin, async (req, res) => {
   try {
     const { id } = req.body;
     await BankTr.findByIdAndDelete(id);
-    res.redirect('/bnk');
+    res.redirect('/knb');
   } catch (err) {
     console.error('❌ Delete Bank Error:', err);
     res.status(500).send('Failed to delete bank transaction');
