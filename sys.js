@@ -348,7 +348,7 @@ app.get('/dsb', isLogin, async (req, res) => {
 
 // Bank Transactions
 app.get('/bnk', isLogin, isBankTr, async (req, res) => {
-  res.render('bnk', { title: 'Bank Transactions', active: 'bnk' });
+  res.render('bnk', { title: 'Financial Entries', active: 'bnk' });
 });
 
 // Reconciliation Reports
