@@ -10,15 +10,41 @@
     <title><%= title %></title>
     <link rel="icon" href="/images/logo.png">
     <link rel="stylesheet" href="/style.css">
+    <style>
+        @media (max-width:700px) {
+            body {
+                display: block;
+                overflow-y: auto;
+            }
+            .panel {
+                height: auto !important;
+                width: 100%;
+                justify-content: center;
+                align-items: center !important;
+            }
+            .panel.right {
+                margin-bottom: 50px;
+            }
+            .e {
+                font-size: 24px;
+            }
+            .f {
+                margin-top: -10px !important;
+            }
+            form {
+                width: 100% !important;
+            }
+        }
+    </style>
 </head>
 <body class="polaroid">
 
-    <section class="width60 col">
+    <section class="width60 col panel">
         <img src="/images/logo.png" alt="" class="hpx200">
-        <p class="size60">Web-Based Bank</p>
-        <p class="size60 marginTop40n">Reconciliation Tool</p>
+        <p class="e size60">Web-Based Bank</p>
+        <p class="e f size60 marginTop40n">Reconciliation Tool</p>
     </section>
-    <section class="width40 justifyStart">
+    <section class="width40 justifyStart panel right">
         <form action="/login" method="POST" class="width80 shadow2 height0 gap15 corner20">
             <div class="height0 col gap5">
                 <% if (error) { %>
