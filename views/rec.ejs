@@ -1,33 +1,401 @@
 <% layout('layout') %>
-<table>
+
+<section class="padding5 alignStart hidden">
+    <div class="shadow1 corner5 bgWhite relative col justifyStart colorPrimary padding50" id="report" style="height: 1056px !important; width: 816px !important;">
+        <img src="/images/logo.png" alt="" class="absolute hpx100 left25 top25">
+        <img src="/images/pilipinas.png" alt="" class="absolute hpx100 right25 top25">
+        <section class="padding0 col">
+            <p class="size16 str5">BANK RECONCILIATION STATEMENT</p>
+            <p class="size16 str5">GENERAL OPERATING FUND</p>
+            <p class="size16 str5">NATIONAL FOOD AUTHORITY - BULACAN BRANCH OFFICE</p>
+            <p class="size16 str5">As of <%= data.asOfDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %></p>
+        </section>
+        <br>
+
+    <!-- BANK SIDE -->
+    <div class="height0 col alignStart justifyStart padding15 gap10 borderStone400 border1 corner10">
+        <p class="size16 str5">Bank Side</p>
+
+        <p class="size16 justifyBetween width100">
+            <span>Unadjusted Bank Balance</span>
+            <strong><%= data.bankBal.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></strong>
+        </p>
+
+        <p class="size16 justifyBetween width100">
+            <span>Less: Outstanding Checks</span>
+            <span>(<%= data.totalOC.toLocaleString(undefined, { minimumFractionDigits: 2 }) %>)</span>
+        </p>
+
+        <hr>
+
+        <p class="size16 justifyBetween width100 str5">
+            <span>Adjusted Bank Balance</span>
+            <strong><%= data.adjBank.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></strong>
+        </p>
+    </div>
+
+    <br>
+
+
+    <div class="height0 col alignStart justifyStart padding15 gap10 borderStone400 border1 corner10">
+        <p class="size16 str5">Book Side</p>
+
+        <p class="size16 justifyBetween width100">
+            <span>Unadjusted Book Balance</span>
+            <strong><%= data.bookBal.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></strong>
+        </p>
+
+        <p class="size16 justifyBetween width100">
+            <span>Add/Deduct: Memos</span>
+            <span>0.00</span>
+        </p>
+
+        <hr>
+
+        <p class="size16 justifyBetween width100 str5">
+            <span>Adjusted Book Balance</span>
+            <strong><%= data.bookBal.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></strong>
+        </p>
+    </div>
+
+
+    <br><br>
+    <section class="padding0 col alignStart">
+        <p class="size16 str4">Prepared By:</p>
+        <br>
+        <p class="size16 str5">Xai Danielle F. Bulauitan</p>
+        <p class="size16 str4">Accountant III</p>
+    </section>
+
+    <div class="height0 gap15">
+
+</div>
+
+
+    </div>
+</section>
+
+<section class="width100 justifyBetween padding0">
+    <p class="size30 str5">Bank Reconciliation Statement</p>
+    <a href="javascript:void(0)" class="nav bgRed700" id="exportPdf"><i class="fas fa-file-excel"></i> Export Report</a>
+</section>
+<br>
+
+<section class="padding0 justifyBetween">
+    <form action="/rec" method="GET" class="width50 height0 row gap10 justifyStart padding0 corner0">
+        <select name="month" class="wpx150">
+            <% months.forEach((m, index) => { %>
+                <option value="<%= index %>" <%= data.selectedMonth == index ? 'selected' : '' %>><%= m %></option>
+            <% }) %>
+        </select>
+
+        <select name="year" class="wpx150">
+            <% for(let y = currentYear; y >= currentYear - 1; y--) { %>
+                <option value="<%= y %>" <%= data.selectedYear == y ? 'selected' : '' %>><%= y %></option>
+            <% } %>
+        </select>
+        
+
+        <!-- Filter Button -->
+        <button type="submit" class="nav bgBlue900"> <i class="fas fa-filter"></i> Apply Filter</button>
+    </form>
+    <p class="size16 noteGreen">As of <%= data.asOfDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %></p>
+</section>
+
+<br><hr><br>
+
+<div class="height0 gap15">
+    <div class="col alignStart justifyStart padding10 gap10">
+        <table style="width: 100%;">
+            <tr>
+                <th colspan="2">Bank Side</th>
+            </tr>
+            <tr>
+                <td>Unadjusted Bank Balance</td>
+                <td class="text-right"><strong><%= data.bankBal.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></td>
+            </tr>
+            <tr>
+                <td>Less: Outstanding Checks</td>
+                <td class="text-right">(<%= data.totalOC.toLocaleString(undefined, {minimumFractionDigits: 2}) %>)</td>
+            </tr>
+            <tr style="border-top: 2px solid #000;">
+                <td><strong>Adjusted Bank Balance</strong></td>
+                <td class="text-right"><strong><%= data.adjBank.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="col alignStart justifyStart padding10 gap10">
+        <table style="width: 100%;">
+            <tr>
+                <th colspan="2">Book Side</th>
+            </tr>
+            <tr>
+                <td>Unadjusted Book Balance</td>
+                <td class="text-right"><strong><%= data.bookBal.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></td>
+            </tr>
+            <tr>
+                <td>Add/Deduct: Memos</td>
+                <td class="text-right">0.00</td>
+            </tr>
+            <tr style="border-top: 2px solid #000;">
+                <td><strong>Adjusted Book Balance</strong></td>
+                <td class="text-right"><strong><%= data.bookBal.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<br>
+
+<section class="justifyBetween gap10">
+    <% if(Math.abs(data.diff) < 0.01) { %>
+        <p class="noteGreen size16 width0"> STATUS: BALANCED <i class="fas fa-check-circle"></i></p>
+    <% } else { %>
+        <p class="noteRed size16 width0"> DISCREPANCY FOUND <i class="fas fa-xmark-circle"></i></p>
+    <% } %>
+    <p class="str5 size16">
+        <i class="fas fa-info-circle"></i> Difference <%= data.diff.toLocaleString(undefined, {minimumFractionDigits: 2}) %>
+    </p>
+</section>
+
+<br><hr><br>
+
+<section class="gap10 col alignStart">
+        <p class="size14 str5 marginLeft10">Outstanding Checks</p>
+    <table class="table" id="outstanding">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Check No.</th>
+                <th>Particulars</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(data.outstandingList.length > 0) { %>
+                <% data.outstandingList.forEach(oc => { %>
+                    <tr>
+                        <td><%= oc.date.toDateString() %></td>
+                        <td><%= oc.checkNo %></td>
+                        <td><%= oc.desc %></td>
+                        <td class="text-right"><%= oc.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4" class="text-center">No outstanding checks for this period.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</section>
+
+<br><hr><br>
+
+<section class="gap10 col alignStart">
+    <div class="section justifyBetween padding0">
+        <p class="size14 str5 marginLeft10">Deposits in Transit</p>
+        <p class="size14 srt5">Total: <%= data.totalDeposits.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></p>
+    </div>
+    <table class="table" id="deposit">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Voucher/Check No.</th>
+                <th>Particulars</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(data.depositsInTransit.length > 0) { %>
+                <% data.depositsInTransit.forEach(d => { %>
+                    <tr>
+                        <td><%= d.date.toDateString() %></td>
+                        <td><%= d.checkNo || '-' %></td>
+                        <td><%= d.desc %></td>
+                        <td class="text-right"><%= d.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4" class="text-center">No deposits in transit for this period.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</section>
+
+<br><hr><br>
+
+
+<section class="gap10 col alignStart">
+    <p class="size14 str5 marginLeft10">Discrepancies / Exceptions</p>
+    <table class="table" id="except">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Voucher/Check No.</th>
+                <th>Particulars</th>
+                <th>Type</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(data.discrepancies.length > 0) { %>
+                <% data.discrepancies.forEach(d => { %>
+                    <tr>
+                        <td><%= d.date.toDateString() %></td>
+                        <td><%= d.checkNo || '-' %></td>
+                        <td><%= d.desc || '-' %></td>
+                        <td><%= d.type %></td>
+                        <td class="text-right"><%= d.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="5" class="text-center">No discrepancies for this period.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</section>
+
+<table cellpadding="10" class="tCard hidden" id="book">
   <thead>
-    <tr>
-      <th>Date Generated</th>
-      <th>Bank Balance</th>
-      <th>Company Balance</th>
-      <th>Total Outstanding</th>
-      <th>Total Deposit</th>
-      <th>Adjusted Balance</th>
-      <th>Difference</th>
-      <th>Dump</th>
-    </tr>
+    <tr style="background-color: #f2f2f2;">
+      <th>Date</th>
+      <th>Fund</th> <th>Voucher No.</th> <th>Check No.</th> <th>Description/Payee</th>
+      <th>Amount</th>
+      <th>Type</th>
+      <th>Status</th> </tr>
   </thead>
   <tbody>
-    <% if (recos && recos.length) { %>
-      <% recos.forEach(r => { %>
+    <% if (trs && trs.length) { %>
+      <% trs.forEach(tr => { %>
         <tr>
-          <td><%= r.dateGeneratedFormatted %> (<%= r.dateGeneratedAgo %>)</td>
-          <td><%= r.bankBalance.toLocaleString() %></td>
-          <td><%= r.companyBalance.toLocaleString() %></td>
-          <td><%= r.totalOutstanding.toLocaleString() %></td>
-          <td><%= r.totalDeposit.toLocaleString() %></td>
-          <td><%= r.adjustedBalance.toLocaleString() %></td>
-          <td><%= r.difference.toLocaleString() %></td>
-          <td><%= r.dump ? 'Yes' : 'No' %></td>
+          <td><%= tr.dateFormatted %></td>
+          <td><strong><%= tr.accountType %></strong></td> <td><%= tr.voucherNo || 'N/A' %></td>
+          <td><%= tr.checkNo || '---' %></td>
+          <td><%= tr.desc %></td>
+          <td><%= tr.amount.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></td>
+          <td><%= tr.type %></td>
+          <td>
+             <span class="<%= tr.status === 'Reconciled' ? 'noteGreen' : 'noteGray' %>">
+               <%= tr.status %>
+             </span>
+          </td>
         </tr>
       <% }) %>
     <% } else { %>
-      <tr><td colspan="8">No reconciliation reports found.</td></tr>
+      <tr><td colspan="8" style="text-align:center;">No transactions found.</td></tr>
     <% } %>
   </tbody>
 </table>
+
+<table cellpadding="10" class="tCard hidden" id="bank">
+  <thead>
+    <tr style="background-color: #e3f2fd;">
+      <th>Date</th>
+      <th>Fund</th>
+      <th>Check No.</th>
+      <th>Description</th>
+      <th>Amount</th>
+      <th>Type</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (bankTrs && bankTrs.length > 0) { %>
+      <% bankTrs.forEach(tr => { %>
+        <tr>
+          <td><%= tr.dateFormatted %></td>
+          <td><strong><%= tr.accountType %></strong></td>
+          <td><%= tr.checkNo || '---' %></td>
+          <td><%= tr.desc %></td>
+          <td><%= tr.amount.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></td>
+          <td><%= tr.type %></td>
+          <td>
+            <span class="<%= tr.status === 'Reconciled' ? 'noteGreen' : 'noteGray' %>">
+              <%= tr.status %>
+            </span>
+          </td>
+        </tr>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="7" style="text-align:center;">No bank transactions found.</td></tr>
+    <% } %>
+  </tbody>
+</table>
+
+<script>
+document.getElementById('exportPdf').addEventListener('click', async () => {
+
+    /* =========================
+       PART 1: EXPORT PDF
+    ========================== */
+    const { jsPDF } = window.jspdf;
+    const report = document.getElementById('report');
+    const wrapper = report.closest('.hidden');
+
+    if (wrapper) wrapper.classList.remove('hidden');
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const canvas = await html2canvas(report, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('Bank-Reconciliation-Report.pdf');
+
+    if (wrapper) wrapper.classList.add('hidden');
+
+
+    /* =========================
+       PART 2: EXPORT EXCEL
+    ========================== */
+    const wb = XLSX.utils.book_new();
+
+    // Tables to export
+    const tables = [
+        { el: 'outstanding', name: 'Outstanding Checks' },
+        { el: 'deposit', name: 'Deposits in Transit' },
+        { el: 'except', name: 'Discrepancies' },
+        { el: 'bank', name: 'Bank Side' },
+        { el: 'book', name: 'Book Side' },
+    ];
+
+    tables.forEach(t => {
+        const table = document.getElementById(t.el);
+        if (table) {
+            const ws = XLSX.utils.table_to_sheet(table);
+
+            // Auto-fit columns based on content length
+            const colWidths = [];
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                let maxWidth = 10; // minimum width
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    const cellAddress = { c: C, r: R };
+                    const cellRef = XLSX.utils.encode_cell(cellAddress);
+                    const cell = ws[cellRef];
+                    if (cell && cell.v) {
+                        const len = cell.v.toString().length;
+                        if (len > maxWidth) maxWidth = len;
+                    }
+                }
+                colWidths.push({ wch: maxWidth + 2 }); // add padding
+            }
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, t.name);
+        }
+    });
+
+    XLSX.writeFile(wb, 'Bank-Reconciliation-Tables.xlsx');
+});
+</script>
+

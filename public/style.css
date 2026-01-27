@@ -729,6 +729,7 @@ form {
     position: relative;
     width: 100%;
     height: auto;
+    gap: 10px !important;
     color: var(--primary);
 }
 
@@ -755,21 +756,7 @@ form {
     gap: 3px;
     flex-direction: column;
 }
-.field.long {
-    width: 70%;
-}
-.field.short {
-    width: 30%;
-}
-.field.medium {
-    width: 50%;
-}
-.field.tiny {
-    width: 10%;
-}
-.field.large {
-    width: 85%;
-}
+
 .field.radio, .field.checkbox {
     width: 25%;
     flex-direction: row;
@@ -825,7 +812,7 @@ textarea {
     height: calc(6 * 1em);
 }
 
-input, .searchBar, .selectBar {
+input {
     background-color: white;
     border: solid 1px lightgray;
     padding: 10px 10px;
@@ -842,67 +829,20 @@ input, .searchBar, .selectBar {
         width: 15px;
     }
 }
-.selectBar {
-    padding: 0 0;
-    max-width: 200px;
-    padding-inline: 10px;
-    padding-block: 0;
-}
-.selectBar:hover {
-    background-color: white !important;
-}
 
-.searchBar {
-    padding: 8px 8px;
-    flex-direction: row;
-    border-radius: 12px;
-    width: 50%;
-    max-height: 40px;
-    transition: 1s ease;
-}
-.searchBar:hover {
-    border: 2px solid var(--tint3);
-}
-.searchBar:hover i {
-    color: var(--tint3);
-}
-.searchBar input[type=search] {
-    border-radius: 0.5em;
-    border: none;
-    padding: none;
-    i {
-        width: 24px;
-        opacity: 0.6;
-        color: inherit;
-    }
-}
-.searchBar input[type=search]:focus {
-    outline-color: none !important;
+input[type=search] {
+    border-radius: 10px;
     background-color: transparent;
-    border: none !important;
-    color: inherit;
-    i {
-        width: 24px;
-        opacity: 0.6;
-        color: inherit;
-    }
-}
-.searchBar input[type=search]:hover {
-    outline-color: none !important;
-    background-color: transparent;
-    border: none !important;
-}
-
-
-.field .selectBar {
-    width: 100%;
-    max-width: 100%;
+    outline: 0.5px solid lightgray !important;
+    border: 8px solid white;
+    padding: 0px !important;
+    width: auto;
 }
 
 select {
     background-color: white;
-    border: none;
-    padding: 10px 10px;
+    border: 0.5px solid lightgray !important;
+    padding: 0px;
     font-size: 12px;
     font-weight: 500;
     border-radius: 10px;
@@ -910,34 +850,20 @@ select {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100%;
-    max-height: 42px;
+    height: 40px !important;
     outline: none;
     color: var(--shade10);
 }
 
-form .selectBar {
-    border: 0.5px solid lightgray;
-}
 option {
     font-size: 1rem;
 }
 
-form input:hover, .selectBar:hover, form textarea:hover {
-    background-color: var(--tint14);
-}
 
 textarea:focus, textarea:hover {
     height: calc(6 * 1em);
 }
 
-
-input:focus, textarea:focus, .selectBar:focus {
-    border: 0.5px solid var(--radial2) !important;
-    outline: none;
-    background-color: #f9fefb;
-    transition: none;
-}
 
 input[type="checkbox"], input[type="radio"] {
     width: 18px;
@@ -1064,12 +990,6 @@ td {
     text-overflow: ellipsis; 
 }
 
-td:last-child {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 /*
 td:hover {
     text-overflow: visible !important;
@@ -1162,16 +1082,16 @@ progress::-webkit-progress-value { background: var(--gradient3); }
 progress::-moz-progress-bar { background-color: #4caf50; }
 
 .unseen {
-    max-height: 0;
+    max-width: 0;
     opacity: 0;
     overflow: hidden;
-    transition: max-height 0.6s ease-in-out, opacity 0.7s ease;
+    transition: max-width 0.6s ease-in-out, opacity 0.7s ease;
     z-index: 100;
 }
 .seen {
-    max-height: 800px;
+    max-width: 500px;
     opacity: 1;
-    transition: max-height 0.6s ease-in-out, opacity 0.2s ease;
+    transition: max-width 0.6s ease-in-out, opacity 0.2s ease;
     z-index: 100;
 }
 
@@ -1951,6 +1871,12 @@ progress::-moz-progress-bar { background-color: #4caf50; }
 .alignVerticalTextTop { vertical-align: text-top; }
 .alignVerticalTextBottom { vertical-align: text-bottom; }
 .alignVerticalLength { vertical-align: 10px; }
+
+.horizontalTB { writing-mode: horizontal-tb;}
+.verticalRL { writing-mode: vertical-rl; }
+.verticalLR { writing-mode: vertical-lr; }
+.sidewaysRL { writing-mode: sideways-rl; }
+.sidewaysLR { writing-mode: sideways-lr; }
 
 /* BORDER COLORS */
 

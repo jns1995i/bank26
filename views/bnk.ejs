@@ -1,27 +1,157 @@
 <% layout('layout') %>
-<table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Description</th>
-        <th>Amount</th>
-        <th>Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if (bankTrs && bankTrs.length > 0) { %>
-        <% bankTrs.forEach(tr => { %>
-          <tr>
-            <td><%= tr.dateFormatted %> (<%= tr.dateAgo %>)</td>
-            <td><%= tr.desc %></td>
-            <td><%= tr.amount.toLocaleString() %></td>
-            <td><%= tr.type %></td>
-          </tr>
-        <% }) %>
-      <% } else { %>
+
+<section class="justifyBetween">
+  <p class="size30 medium">Bank Transactions (LBP Statement)</p>
+  <div class="area0 padding0 gap10">
+    <input type="search" class="marginLeft5" name="" id="univ" placeholder="Search here ..">
+    <a href="javascript:void(0)" class="nav pnav" id="newTRbtn"><i class="fas fa-plus"></i> Add Record</a>
+  </div>
+</section>
+
+<br>
+
+<p class="noFound noteGray size18 width0" style="display:none;">No results found.</p>
+
+<table cellpadding="10" class="tCard" id="bank">
+  <thead>
+    <tr style="background-color: #e3f2fd;">
+      <th>Date</th>
+      <th>Fund</th>
+      <th>Check No.</th>
+      <th>Description</th>
+      <th>Amount</th>
+      <th>Type</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (bankTrs && bankTrs.length > 0) { %>
+      <% bankTrs.forEach(tr => { %>
         <tr>
-          <td colspan="5">No bank transactions found.</td>
+          <td><%= tr.dateFormatted %></td>
+          <td><strong><%= tr.accountType %></strong></td>
+          <td><%= tr.checkNo || '---' %></td>
+          <td><%= tr.desc %></td>
+          <td><%= tr.amount.toLocaleString(undefined, { minimumFractionDigits: 2 }) %></td>
+          <td><%= tr.type %></td>
+          <td>
+            <span class="<%= tr.status === 'Reconciled' ? 'noteGreen' : 'noteGray' %>">
+              <%= tr.status %>
+            </span>
+          </td>
         </tr>
-      <% } %>
-    </tbody>
-  </table>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="7" style="text-align:center;">No bank transactions found.</td></tr>
+    <% } %>
+  </tbody>
+</table>
+
+<div class="col fixed right0 bgWhite shadow2 justifyStart top0 padding20 unseen" id="newTRCard">
+    <form action="/newBNK" method="POST" class="">
+
+      <div class="field">
+            <p class="size30 medium">Add New Record</p>
+      </div>
+
+      <div class="field">
+        <label for="">Transaction Date (per Bank):</label>
+        <input type="date" name="date" required>
+      </div>
+
+      <div class="field">
+        <label for="">Account / Fund: </label>
+          <select name="accountType" required style="width: 100%; padding: 8px;">
+            <option value="GOF">GOF (General Operating Fund)</option>
+            <option value="CPF">CPF (Corporate Partnership Fund)</option>
+            <option value="RCA">RCA (Rice Collection Account)</option>
+            <option value="MSC">MSC (Miscellaneous)</option>
+          </select>
+      </div>
+
+      <div class="field">
+        <label for="">Check Number (if applicable): </label>
+        <input type="text" name="checkNo" placeholder="Enter Check # from statement" style="width: 100%; padding: 8px;">
+        <small style="color: #666;">Leave blank for ATM/Interest/Fees</small>
+      </div>
+
+      <div class="field">
+        <label for="">Bank Description</label>
+        <input type="text" name="desc" required placeholder="e.g., ENCASHMENT, CM, DM">
+      </div>
+
+      <div class="field">
+        <label for="">Amount</label>
+        <input type="number" name="amount" step="0.01" required style="width: 100%; padding: 8px;">
+      </div>
+
+      <div class="field">
+        <label for="">Type</label>
+          <select name="type" required style="width: 100%; padding: 8px;">
+            <option value="Debit">Debit (Bank Out)</option>
+            <option value="Credit">Credit (Bank In)</option>
+          </select>
+      </div>
+
+      <div class="field alignEnd">
+        <button class="nav pnav wpx150" type="submit">Add to Record</button>
+      </div>
+
+    </form>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('newTRbtn');
+    const card = document.getElementById('newTRCard');
+
+    if (!btn || !card) return;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      card.classList.remove('unseen');
+      card.classList.add('seen');
+    });
+
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', () => {
+      card.classList.remove('seen');
+      card.classList.add('unseen');
+    });
+  });
+</script>
+
+<script>
+const searchInput = document.getElementById('univ');
+const table = document.querySelector('.tCard');          // ✅ table
+const rows = document.querySelectorAll('.tCard tbody tr');
+const noFound = document.querySelector('.noFound');
+
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        if (row.textContent.toLowerCase().includes(query)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // ✅ toggle table + noFound
+    if (visibleCount === 0) {
+        table.style.display = 'none';
+        noFound.style.display = 'block';
+    } else {
+        table.style.display = '';
+        noFound.style.display = 'none';
+    }
+});
+</script>
+

@@ -15,16 +15,10 @@ const helmet = require('helmet');
 const isLogin = require('./middleware/isLogin');
 const isTr = require('./middleware/isTr');
 const isBankTr = require('./middleware/isBankTr');
-const isDeposit = require('./middleware/isDeposit');
-const isOut = require('./middleware/isOut');
-const isExcept = require('./middleware/isExcept');
 const isReco = require('./middleware/isReco');
 
 const Tr = require('./model/tr');
 const BankTr = require('./model/banktr');
-const Deposit = require('./model/deposit');
-const Out = require('./model/out');
-const Except = require('./model/except');
 const Reco = require('./model/reco');
 const Users = require('./model/user');
 
@@ -101,6 +95,7 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
+
       scriptSrc: [
         "'self'",
         "'unsafe-inline'",
@@ -111,6 +106,7 @@ app.use(
         "https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js",
         "https://cdn.sheetjs.com/*"
       ],
+
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
@@ -119,6 +115,7 @@ app.use(
         "https://cdn.jsdelivr.net",
         "https://ka-f.fontawesome.com"
       ],
+
       fontSrc: [
         "'self'",
         "https://fonts.gstatic.com",
@@ -127,21 +124,27 @@ app.use(
         "https://cdn.jsdelivr.net",
         "https://ka-f.fontawesome.com"
       ],
+
       imgSrc: [
         "'self'",
         "data:",
-        "https://res.cloudinary.com",
+        "blob:",                    // ✅ ADDED
+        "https://res.cloudinary.com"
       ],
+
       connectSrc: [
         "'self'",
+        "blob:",                    // ✅ ADDED
         "https://ka-f.fontawesome.com",
         "https://cdn.jsdelivr.net"
       ],
+
       objectSrc: ["'none'"],
       frameSrc: ["'self'"],
     }
   })
 );
+
 
 
 app.use((req, res, next) => {
@@ -375,7 +378,7 @@ app.post('/login', async (req, res) => {
     };
 
     // 🔹 STEP 4: Redirect (simple)
-    return res.redirect('/dsb');
+    return res.redirect('/rec');
 
   } catch (err) {
     console.error('⚠️ Login error:', err);
@@ -402,25 +405,110 @@ app.get('/trs', isLogin, isTr, async (req, res) => {
   res.render('trs', { title: 'Company Transactions', active: 'trs' });
 });
 
-// Deposits
-app.get('/dep', isLogin, isDeposit, async (req, res) => {
-  res.render('dep', { title: 'Deposits', active: 'dep' });
+app.get('/prf', isLogin, async (req, res) => {
+  res.render('prf', { title: 'Profile', active: 'prf' });
 });
 
-// Outstanding Checks
-app.get('/out', isLogin, isOut, async (req, res) => {
-  res.render('out', { title: 'Outstanding Checks', active: 'out' });
+app.get('/rec', isLogin, isBankTr, isTr, async (req, res) => {
+  try {
+    const now = new Date();
+
+    // -----------------------------
+    // Filters
+    // -----------------------------
+    const selectedMonth = req.query.month !== undefined ? Number(req.query.month) : now.getMonth(); // 0-11
+    const selectedYear = req.query.year !== undefined ? Number(req.query.year) : now.getFullYear();
+    const accountType = req.query.accountType || 'GOF';
+
+    // Last millisecond of selected month
+    const asOfDate = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59, 999);
+
+    // -----------------------------
+    // Fetch Transactions
+    // -----------------------------
+    const bookTars = await Tr.find({ accountType, date: { $lte: asOfDate } });
+    const bankTars = await BankTr.find({ accountType, date: { $lte: asOfDate } });
+
+    const bookBal = bookTars.reduce((acc, curr) => curr.type === 'Credit' ? acc + curr.amount : acc - curr.amount, 0);
+    const bankBal = bankTars.reduce((acc, curr) => curr.type === 'Credit' ? acc + curr.amount : acc - curr.amount, 0);
+
+    // -----------------------------
+    // Outstanding Checks
+    // -----------------------------
+    const allBookChecks = bookTars.filter(t => t.type === 'Debit' && t.checkNo);
+    const clearedCheckNos = bankTars.filter(t => t.type === 'Debit' && t.checkNo).map(b => b.checkNo);
+    const outstandingList = allBookChecks.filter(t => !clearedCheckNos.includes(t.checkNo));
+    const totalOC = outstandingList.reduce((sum, item) => sum + item.amount, 0);
+
+    // -----------------------------
+    // Deposits in Transit
+    // -----------------------------
+    const allBookCredits = bookTars.filter(t => t.type === 'Credit' && t.checkNo);
+    const clearedBankCredits = bankTars.filter(t => t.type === 'Credit' && t.checkNo).map(b => b.checkNo);
+    const depositsInTransit = allBookCredits.filter(bc => !clearedBankCredits.includes(bc.checkNo));
+    const totalDeposits = depositsInTransit.reduce((sum, item) => sum + item.amount, 0);
+
+    // -----------------------------
+    // Discrepancies
+    // -----------------------------
+    const bankOnlyDebits = bankTars.filter(b => b.type === 'Debit' && !b.checkNo);
+    const bankOnlyCredits = bankTars.filter(
+      b => b.type === 'Credit' && !allBookCredits.some(bc => bc.checkNo === b.checkNo)
+    );
+    const discrepancies = [...bankOnlyDebits, ...bankOnlyCredits];
+
+    // -----------------------------
+    // Update Reconciled Status
+    // -----------------------------
+    for (let bookTr of bookTars) {
+      if (bookTr.checkNo) {
+        const matchedBank = bankTars.find(b => b.checkNo === bookTr.checkNo);
+        if (matchedBank) {
+          if (bookTr.status !== 'Reconciled') await Tr.findByIdAndUpdate(bookTr._id, { status: 'Reconciled' });
+          if (matchedBank.status !== 'Reconciled') await BankTr.findByIdAndUpdate(matchedBank._id, { status: 'Reconciled' });
+        }
+      }
+    }
+
+    // -----------------------------
+    // Adjusted Balances
+    // -----------------------------
+    const adjBank = bankBal - totalOC + totalDeposits;
+    const diff = adjBank - bookBal;
+
+    // -----------------------------
+    // Render Page
+    // -----------------------------
+    res.render('rec', {
+      title: 'Reconciliation Reports',
+      active: 'rec',
+      data: {
+        bankBal,
+        bookBal,
+        totalOC,
+        outstandingList,
+        depositsInTransit,
+        totalDeposits,
+        discrepancies,
+        adjBank,
+        diff,
+        selectedMonth,
+        selectedYear,
+        accountType,
+        asOfDate
+      },
+      months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      currentYear: now.getFullYear()
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-// Exceptions
-app.get('/exc', isLogin, isExcept, async (req, res) => {
-  res.render('exc', { title: 'Exceptions', active: 'exc' });
-});
 
-// Reconciliation Reports
-app.get('/rec', isLogin, isReco, async (req, res) => {
-  res.render('rec', { title: 'Reconciliation Reports', active: 'rec' });
-});
+
 
 // Reconciliation Reports
 app.get('/rpt', isLogin, async (req, res) => {
@@ -456,6 +544,30 @@ app.post('/newTR', isLogin, isTr, async (req, res) => {
       title: 'Company Transactions', 
       error: 'Failed to save record. Check your inputs.' 
     });
+  }
+});
+
+app.post('/newBNK', isLogin, isBankTr, async (req, res) => {
+  try {
+    const { date, accountType, checkNo, desc, amount, type } = req.body;
+
+    const newBankTr = new BankTr({
+      date,
+      accountType,
+      checkNo,
+      desc,
+      amount,
+      type,
+      status: 'Recorded', // Default status
+      dump: false
+    });
+
+    await newBankTr.save();
+    
+    res.redirect('/bnk');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/bnk');
   }
 });
 

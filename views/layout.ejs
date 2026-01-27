@@ -7,9 +7,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+
     <title><%= title %></title>
     <link rel="icon" href="/images/logo.png">
     <link rel="stylesheet" href="/style.css">
+    <style>
+        th {
+            box-shadow: none !important;
+            border: 0.5px solid rgb(195, 195, 195);
+        }
+    </style>
 </head>
 <body>
 
@@ -20,16 +31,17 @@
         <div class="menu height70">
             <p class="size14">Menu</p>
             <hr class="marginBottom5">
-            <a href="/dsb" class="nav mnav <% if ( active === 'dsb') { %> active liquid <% } %>">Dashboard</a>
             <a href="/rec" class="nav mnav <% if ( active === 'rec') { %> active liquid <% } %>">Reconciliation</a>
+            <a href="/trs" class="nav mnav <% if ( active === 'trs') { %> active liquid <% } %>">Book</a>
             <a href="/bnk" class="nav mnav <% if ( active === 'bnk') { %> active liquid <% } %>">Bank</a>
-            <a href="/trs" class="nav mnav <% if ( active === 'trs') { %> active liquid <% } %>">Transactions</a>
+
             <a href="/dep" class="hidden nav mnav <% if ( active === 'dep') { %> active liquid <% } %>">Deposit</a>
             <a href="/out" class="hidden nav mnav <% if ( active === 'out') { %> active liquid <% } %>">Outstanding</a>
             <a href="/rpt" class="hidden nav mnav <% if ( active === 'rpt') { %> active liquid <% } %>">Reports</a>
+            <a href="/dsb" class="hidden nav mnav <% if ( active === 'dsb') { %> active liquid <% } %>">Dashboard</a>
         </div>
         <div class="menu height15 justifyEnd">
-            <a href="/" class="nav mnav liquid <% if ( active === '') { %> active liquid <% } %>">Profile</a>
+            <a href="/prf" class="nav mnav liquid width100<% if ( active === '') { %> active liquid <% } %>"><i class="fas fa-user"></i>Profile</a>
             <a href="/" class="nav mnav liquid width100 <% if ( active === '') { %> active liquid <% } %>"><i class="fas fa-sign-out"></i> Logout</a>
         </div>
         <div class="height10 justifyBetween alignEnd hidden">
@@ -38,70 +50,10 @@
     </div>
     <div class="mainf">
         <%- body %>
-    </div>
+    </div> 
 
+    <script src="/js/selectBar.js"></script>
 
-<% if ( active === 'trs') { %>
-<div class="width30 col fixed right0 bgWhite shadow2 justifyStart padding20">
-    <form action="/newTR" method="POST" class="height0 col gap10">
-
-        <div class="field">
-            <p class="size30 medium">Add New Record</p>
-        </div>
-
-        <div class="field">
-            <label for="">Date</label>
-            <input type="date" name="date" required>
-        </div>
-
-        <div class="field">
-            <label for="">Account / Fund Type</label>
-            <div class="selectBar">
-                <select name="accountType" required style="width: 100%; padding: 8px;">
-                <option value="">-- Select Fund --</option>
-                <option value="GOF">GOF (General Operating Fund)</option>
-                <option value="CPF">CPF (Corporate Partnership Fund)</option>
-                <option value="RCA">RCA (Rice Collection Account)</option>
-                <option value="MSC">MSC (Miscellaneous)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="field">
-            <label for="">Voucher No.</label>
-          <input type="text" name="voucherNo" placeholder="e.g. 25-11-1496" style="width: 100%; padding: 8px;">
-        </div>
-        <div class="field">
-            <label for="">Check No.</label>
-          <input type="text" name="checkNo" placeholder="e.g. 1723917" style="width: 100%; padding: 8px;">
-        </div>
-        <div class="field">
-            <label for="">Description / Remarks</label>
-            <textarea name="desc" required placeholder="Who was paid and for what?" style="width: 100%; padding: 8px;"></textarea>
-        </div>
-        <div class="field">
-            <label for="">Amount</label>
-          <input type="number" name="amount" step="0.01" required placeholder="0.00" style="width: 100%; padding: 8px;">
-        </div>
-        <div class="field">
-            <label for="">Entry Type:</label>
-            <div class="selectBar">
-                <select name="type" required style="width: 100%; padding: 8px;">
-                    <option value="Debit">Debit (Disbursement)</option>
-                    <option value="Credit">Credit (Collection)</option>
-                </select>
-            </div>
-        </div>
-
-        <section class="justifyBetween padding0">
-            <a href="" class="nav width20">Cancel</a>
-            <button class="nav width20 pnav" type="submit">Add to Record</button>
-        </section>
-
-    </form>
-
-</div>
-<% } %>   
     
 </body>
 </html>
