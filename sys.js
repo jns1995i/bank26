@@ -571,6 +571,80 @@ app.post('/newBNK', isLogin, isBankTr, async (req, res) => {
   }
 });
 
+app.post('/editTR', isLogin, isTr, async (req, res) => {
+  try {
+    const { id, date, accountType, voucherNo, checkNo, desc, amount, type } = req.body;
+
+    // Find the transaction by ID and update
+    await Tr.findByIdAndUpdate(id, {
+      date,
+      accountType,
+      voucherNo,
+      checkNo,
+      desc,
+      amount,
+      type
+    });
+
+    // Redirect back to the transactions page
+    res.redirect('/trs');
+  } catch (err) {
+    console.error('❌ Update Error:', err);
+    res.status(500).render('trs', {
+      title: 'Company Transactions',
+      error: 'Failed to update record. Check your inputs.'
+    });
+  }
+});
+
+app.post('/deleteTR', isLogin, isTr, async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    await Tr.findByIdAndDelete(id);
+
+    res.redirect('/trs'); // Back to the transactions page
+  } catch (err) {
+    console.error('❌ Delete Error:', err);
+    res.status(500).render('trs', {
+      title: 'Company Transactions',
+      error: 'Failed to delete record.'
+    });
+  }
+});
+
+app.post('/editBNK', isLogin, async (req, res) => {
+  try {
+    const { id, date, accountType, checkNo, desc, amount, type } = req.body;
+
+    await BankTr.findByIdAndUpdate(id, {
+      date,
+      accountType,
+      checkNo,
+      desc,
+      amount,
+      type
+    });
+
+    res.redirect('/bnk');
+  } catch (err) {
+    console.error('❌ Update Bank Error:', err);
+    res.status(500).send('Failed to update bank transaction');
+  }
+});
+
+// Delete bank transaction
+app.post('/deleteBNK', isLogin, async (req, res) => {
+  try {
+    const { id } = req.body;
+    await BankTr.findByIdAndDelete(id);
+    res.redirect('/bnk');
+  } catch (err) {
+    console.error('❌ Delete Bank Error:', err);
+    res.status(500).send('Failed to delete bank transaction');
+  }
+});
+
 
 
 

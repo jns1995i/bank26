@@ -15,13 +15,14 @@
 <table cellpadding="10" class="tCard" id="bank">
   <thead>
     <tr style="background-color: #e3f2fd;">
-      <th>Date</th>
-      <th>Fund</th>
-      <th>Check No.</th>
-      <th>Description</th>
-      <th>Amount</th>
-      <th>Type</th>
-      <th>Status</th>
+      <th class="width15">Date</th>
+      <th class="width10">Fund</th>
+      <th class="width10">Check No.</th>
+      <th class="width20">Description</th>
+      <th class="width15">Amount</th>
+      <th class="width10">Type</th>
+      <th class="width10">Status</th>
+      <th class="width10">Action</th>
     </tr>
   </thead>
   <tbody>
@@ -38,6 +39,23 @@
             <span class="<%= tr.status === 'Reconciled' ? 'noteGreen' : 'noteGray' %>">
               <%= tr.status %>
             </span>
+          </td>
+          <td>
+        <a href="javascript:void(0)" class="inline editBtn nav corner10"
+            data-id="<%= tr._id %>"
+            data-date="<%= tr.date.toISOString().split('T')[0] %>"
+            data-accounttype="<%= tr.accountType %>"
+            data-checkno="<%= tr.checkNo %>"
+            data-desc="<%= tr.desc %>"
+            data-amount="<%= tr.amount %>"
+            data-type="<%= tr.type %>">
+            <i class="fas fa-pen"></i>
+          </a>
+            &nbsp;
+            <a href="javascript:void(0)" class="inline delBtn nav corner10"
+              data-id="<%= tr._id %>">
+              <i class="fas fa-trash"></i>
+            </a>
           </td>
         </tr>
       <% }) %>
@@ -100,6 +118,63 @@
     </form>
 </div>
 
+<div class="col fixed centerAll bgWhite shadow2 justifyStart top0 right0 padding20 unseen" id="editTRCard">
+  <form action="/editBNK" method="POST">
+    <input type="hidden" name="id" id="editTRId">
+
+    <div class="field">
+      <p class="size30 medium">Edit Bank Record</p>
+    </div>
+
+    <div class="field">
+      <label for="">Transaction Date:</label>
+      <input type="date" name="date" id="editDate" required>
+    </div>
+
+    <div class="field">
+      <label for="">Account / Fund:</label>
+      <select name="accountType" id="editAccountType" required style="width: 100%; padding: 8px;">
+        <option value="">-- Select Fund --</option>
+        <option value="GOF">GOF (General Operating Fund)</option>
+        <option value="CPF">CPF (Corporate Partnership Fund)</option>
+        <option value="RCA">RCA (Rice Collection Account)</option>
+        <option value="MSC">MSC (Miscellaneous)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="">Check Number (if applicable):</label>
+      <input type="text" name="checkNo" id="editCheckNo" style="width: 100%; padding: 8px;">
+      <small style="color: #666;">Leave blank for ATM/Interest/Fees</small>
+    </div>
+
+    <div class="field">
+      <label for="">Bank Description:</label>
+      <input type="text" name="desc" id="editDesc" required style="width: 100%; padding: 8px;">
+    </div>
+
+    <div class="field">
+      <label for="">Amount:</label>
+      <input type="number" name="amount" id="editAmount" step="0.01" required style="width: 100%; padding: 8px;">
+    </div>
+
+    <div class="field">
+      <label for="">Type:</label>
+      <select name="type" id="editType" required style="width: 100%; padding: 8px;">
+        <option value="Debit">Debit (Bank Out)</option>
+        <option value="Credit">Credit (Bank In)</option>
+      </select>
+    </div>
+
+    <br>
+    <div class="height0 justifyBetween padding0">
+      <a href="javascript:void(0)" class="nav wpx150" id="cancelEdit">Cancel</a>
+      <button class="nav wpx150 pnav" type="submit">Save Changes</button>
+    </div>
+  </form>
+</div>
+
+
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -155,3 +230,102 @@ searchInput.addEventListener('input', () => {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const newCard = document.getElementById('newTRCard');
+  const newBtn = document.getElementById('newTRbtn');
+
+  // Open new transaction card
+  newBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    newCard.classList.remove('unseen');
+    newCard.classList.add('seen');
+  });
+
+  newCard.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', () => {
+    newCard.classList.remove('seen');
+    newCard.classList.add('unseen');
+  });
+
+  // Edit bank transactions
+  const editCard = document.getElementById('editTRCard');
+  document.querySelectorAll('.editBtn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      editCard.classList.remove('unseen');
+      editCard.classList.add('seen');
+
+      document.getElementById('editTRId').value = btn.dataset.id;
+      document.getElementById('editDate').value = btn.dataset.date;
+      document.getElementById('editAccountType').value = btn.dataset.accounttype;
+      document.getElementById('editCheckNo').value = btn.dataset.checkno || '';
+      document.getElementById('editDesc').value = btn.dataset.desc || '';
+      document.getElementById('editAmount').value = btn.dataset.amount || 0;
+      document.getElementById('editType').value = btn.dataset.type;
+    });
+  });
+
+  document.getElementById('cancelEdit').addEventListener('click', () => {
+    editCard.classList.remove('seen');
+    editCard.classList.add('unseen');
+  });
+
+  editCard.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', e => {
+    if (!editCard.contains(e.target) && !e.target.classList.contains('editBtn')) {
+      editCard.classList.remove('seen');
+      editCard.classList.add('unseen');
+    }
+  });
+
+  // Delete bank transactions
+  document.querySelectorAll('.delBtn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      if (!confirm('Are you sure you want to delete this bank transaction?')) return;
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/deleteBNK';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'id';
+      input.value = btn.dataset.id;
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
+
+  // Search/filter
+  const searchInput = document.getElementById('univ');
+  const table = document.querySelector('.tCard');
+  const rows = document.querySelectorAll('.tCard tbody tr');
+  const noFound = document.querySelector('.noFound');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      if (row.textContent.toLowerCase().includes(query)) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    if (visibleCount === 0) {
+      table.style.display = 'none';
+      noFound.style.display = 'block';
+    } else {
+      table.style.display = '';
+      noFound.style.display = 'none';
+    }
+  });
+});
+</script>
