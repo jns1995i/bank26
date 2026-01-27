@@ -18,9 +18,9 @@
     "test": "test"
   },
   "scripts": {
-  "start": "node sys.js",
-  "dev": "nodemon sys.js"
-},
+    "start": "node sys.js",
+    "dev": "nodemon sys.js"
+  },
   "dependencies": {
     "cloudinary": "^1.41.3",
     "connect-flash": "^0.1.1",
@@ -35,7 +35,8 @@
     "mongoose": "^9.1.5",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

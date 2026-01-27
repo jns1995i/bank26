@@ -1,7 +1,7 @@
 <% layout('layout') %>
 
 <section class="justifyBetween">
-  <p class="size30 medium">Bank Transactions (LBP Statement)</p>
+  <p class="size30 medium">Bank Transactions</p>
   <div class="area0 padding0 gap10">
     <input type="search" class="marginLeft5" name="" id="univ" placeholder="Search here ..">
     <a href="javascript:void(0)" class="nav pnav" id="newTRbtn"><i class="fas fa-plus"></i> Add Record</a>
@@ -106,8 +106,8 @@
       <div class="field">
         <label for="">Type</label>
           <select name="type" required style="width: 100%; padding: 8px;">
-            <option value="Debit">Debit (Bank Out)</option>
-            <option value="Credit">Credit (Bank In)</option>
+            <option value="Debit">Debit (Disbursements)</option>
+            <option value="Credit">Credit (Receipts)</option>
           </select>
       </div>
 
@@ -161,8 +161,8 @@
     <div class="field">
       <label for="">Type:</label>
       <select name="type" id="editType" required style="width: 100%; padding: 8px;">
-        <option value="Debit">Debit (Bank Out)</option>
-        <option value="Credit">Credit (Bank In)</option>
+        <option value="Debit">Debit (Disbursements)</option>
+        <option value="Credit">Credit (Receipts)</option>
       </select>
     </div>
 

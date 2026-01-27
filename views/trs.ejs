@@ -2,7 +2,7 @@
 
 
 <section class="justifyBetween">
-  <p class="size30 medium">Book Transactions (Internal Ledger)</p>
+  <p class="size30 medium">Book Transactions</p>
   <div class="area0 padding0 gap10">
     <input type="search" class="marginLeft5" name="" id="univ" placeholder="Search here ..">
     <a href="javascript:void(0)" class="nav pnav" id="newTRbtn"><i class="fas fa-plus"></i> Add Record</a>
@@ -157,8 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="field">
             <label for="">Entry Type:</label>
             <select name="type" required>
-                <option value="Debit">Debit (Disbursement)</option>
-                <option value="Credit">Credit (Collection)</option>
+                <option value="Debit">Debit (Receipts)</option>
+                <option value="Credit">Credit (Disbursement)</option>
             </select>
         </div>
         <br>
@@ -273,8 +273,8 @@ searchInput.addEventListener('input', () => {
     <div class="field">
       <label for="">Entry Type:</label>
       <select name="type" id="editType" required>
-        <option value="Debit">Debit (Disbursement)</option>
-        <option value="Credit">Credit (Collection)</option>
+          <option value="Debit">Debit (Receipts)</option>
+          <option value="Credit">Credit (Disbursement)</option>
       </select>
     </div>
 

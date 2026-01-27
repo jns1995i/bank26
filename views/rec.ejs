@@ -77,9 +77,62 @@
 
 <section class="width100 justifyBetween padding0">
     <p class="size30 str5">Bank Reconciliation Statement</p>
-    <a href="javascript:void(0)" class="nav bgRed700" id="exportPdf"><i class="fas fa-file-excel"></i> Export Report</a>
+    <div class="area0 gap10">
+        <a href="javascript:void(0)" class="nav" id="settingBtn"><i class="fas fa-cog"></i> Set Beginning</a>
+        |
+        <a href="javascript:void(0)" class="nav bgBlue900" id="importBtn"><i class="fas fa-file-excel"></i> Import Report</a>
+        <a href="javascript:void(0)" class="nav bgRed700" id="exportPdf"><i class="fas fa-file-excel"></i> Export Report</a>
+    </div>
 </section>
 <br>
+
+    <div class="width35 height100 fixed right0 top0 padding20 shadow2 col index50 bgWhite unseen" id="importCard">
+        <p class="size24 medium">Import Monthly Data</p>
+        <form action="/importExcel" method="POST" enctype="multipart/form-data">
+            <div class="field">
+                <label>Select Master Account (for Book/Bank sheets):</label>
+                <select name="accountType" class="width100 padding10">
+                    <option value="GOF">GOF (General Operating Fund)</option>
+                    <option value="CPF">CPF (Corporate Partnership Fund)</option>
+                    <option value="RCA">RCA (Rice Collection Account)</option>
+                </select>
+            </div>
+            <section class="col borderStone400 border05 corner10 alignStart textLeft padding20">
+                <p class="size12"><i class="fas fa-exclamation-triangle"></i> CRITICAL: Use the Correct Excel Format</p>
+                <br>
+                <p class="size12">The system will only read your file if the sheets are named exactly as follows:</p>
+                <br>
+                <p class="size12"><i class="fas fa-check-circle"></i> Sheet "book":</strong> Put your <u>Bank Statement</u> here. (Cols: Date, Desc, Debit, Credit, Balance, Branch, Check No)</p><br>
+                <p class="size12"><i class="fas fa-check-circle"></i> Sheet "bank":</strong> Put your <u>General Ledger</u> here. (Cols: Date, Payee, Particulars, Check No, Dr, Cr, Balance)</p><br>
+                <p class="size12"><i class="fas fa-check-circle"></i> Sheet "oc":</strong> Put your <u>Outstanding Checks</u> here. (Cols: Date, Payee, Check #, Particulars, Amount)</p><br>
+                <br>
+                <p class="size12">Note: Headers must start on Row 1. Do not leave empty rows at the top.</p>
+            </section>
+            <div class="field">
+                <input type="file" name="excelFile" accept=".xlsx, .xls" required>
+            </div>
+            <button type="submit" class="nav pnav width100">Upload and Process</button>
+        </form>
+    </div>
+
+    
+    <div class="width25 height100 fixed right0 top0 padding20 shadow2 col index50 bgWhite unseen" id="settingCard">
+        <form action="/update-settings" method="POST">
+            <input type="hidden" name="accountType" value="<%= data.accountType %>">
+            <p class="size20">Set Starting Balances for <%= data.accountType %></p>
+            <div class="field">
+                <label for="">Book Beginning</label>
+                <input type="number" step="0.01" name="bookBeginning" value="<%= data.settings.bookBeginning %>" placeholder="Book Starting">
+            </div>
+            <br>
+            <div class="field">
+                <label for="">Bank Beginning</label>
+                <input type="number" step="0.01" name="bankBeginning" value="<%= data.settings.bankBeginning %>" placeholder="Bank Starting">
+            </div>
+            <br>
+            <button type="submit" class="nav pnav width100">Update</button>
+        </form>
+    </div>
 
 <section class="padding0 justifyBetween">
     <form action="/rec" method="GET" class="width50 height0 row gap10 justifyStart padding0 corner0">
@@ -397,5 +450,50 @@ document.getElementById('exportPdf').addEventListener('click', async () => {
 
     XLSX.writeFile(wb, 'Bank-Reconciliation-Tables.xlsx');
 });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Function to handle toggle logic
+    const setupToggle = (btnId, cardId) => {
+      const btn = document.getElementById(btnId);
+      const card = document.getElementById(cardId);
+
+      if (!btn || !card) return;
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Optional: Close other open cards before opening this one
+        document.querySelectorAll('.seen').forEach(openCard => {
+            if(openCard !== card) {
+                openCard.classList.replace('seen', 'unseen');
+            }
+        });
+
+        card.classList.remove('unseen');
+        card.classList.add('seen');
+      });
+
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    };
+
+    // Initialize for Import
+    setupToggle('importBtn', 'importCard');
+    
+    // Initialize for Settings
+    setupToggle('settingBtn', 'settingCard');
+
+    // Global click to close any open card
+    document.addEventListener('click', () => {
+      const openCards = document.querySelectorAll('.seen');
+      openCards.forEach(card => {
+        card.classList.remove('seen');
+        card.classList.add('unseen');
+      });
+    });
+  });
 </script>
 

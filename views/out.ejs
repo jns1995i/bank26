@@ -1,29 +1,235 @@
 <% layout('layout') %>
-<table>
+
+<section class="justifyBetween">
+  <p class="size30 medium">Outstanding Checks</p>
+  <div class="area0 padding0 gap10">
+    <input type="search" class="marginLeft5" name="" id="univ" placeholder="Search check # or payee..">
+    <a href="javascript:void(0)" class="nav pnav" id="newOutBtn"><i class="fas fa-plus"></i> Add Manual Check</a>
+  </div>
+</section>
+
+<br>
+
+<p class="noFound noteGray size18 width0" style="display:none;">No results found.</p>
+
+<table cellpadding="10" class="tCard" id="outTable">
   <thead>
-    <tr>
-      <th>Check No</th>
-      <th>Issued At</th>
-      <th>Payee</th>
-      <th>Amount</th>
-      <th>Status</th>
-      <th>Dump</th>
+    <tr style="background-color: #fff3e0;">
+      <th class="width15">Date Issued</th>
+      <th class="width10">Fund</th>
+      <th class="width10">Check No.</th>
+      <th class="width20">Payee / Creditor</th>
+      <th class="width15">Amount</th>
+      <th class="width10">Status</th>
+      <th class="width10">Action</th>
     </tr>
   </thead>
   <tbody>
-    <% if (outs && outs.length) { %>
+    <% if (outs && outs.length > 0) { %>
       <% outs.forEach(o => { %>
         <tr>
+          <td><%= o.dateFormatted %></td>
+          <td><strong><%= o.accountType %></strong></td>
           <td><%= o.checkNo %></td>
-          <td><%= o.issuedAtFormatted %> (<%= o.issuedAtAgo %>)</td>
           <td><%= o.payee %></td>
-          <td><%= o.amount.toLocaleString() %></td>
-          <td><%= o.status %></td>
-          <td><%= o.dump ? 'Yes' : 'No' %></td>
+          <td><%= o.displayAmount %></td>
+          <td>
+            <span class="<%= o.status === 'Cleared' ? 'noteGreen' : 'noteGray' %>">
+              <%= o.status %>
+            </span>
+          </td>
+          <td>
+            <a href="javascript:void(0)" class="inline editOutBtn nav corner10"
+              data-id="<%= o._id %>"
+              data-date="<%= o.date ? new Date(o.date).toISOString().split('T')[0] : '' %>"
+              data-accounttype="<%= o.accountType %>"
+              data-checkno="<%= o.checkNo %>"
+              data-payee="<%= o.payee %>"
+              data-particulars="<%= o.particulars %>"
+              data-amount="<%= o.amount %>">
+              <i class="fas fa-pen"></i>
+            </a>
+            &nbsp;
+            <a href="javascript:void(0)" class="inline delOutBtn nav corner10"
+              data-id="<%= o._id %>">
+              <i class="fas fa-trash"></i>
+            </a>
+          </td>
         </tr>
       <% }) %>
     <% } else { %>
-      <tr><td colspan="6">No outstanding checks found.</td></tr>
+      <tr><td colspan="7" style="text-align:center;">No manual outstanding checks recorded.</td></tr>
     <% } %>
   </tbody>
 </table>
+
+<div class="col fixed right0 bgWhite shadow2 justifyStart top0 padding20 unseen" id="newOutCard">
+    <form action="/newOUT" method="POST">
+      <div class="field">
+            <p class="size30 medium">Add Outstanding Check</p>
+      </div>
+
+      <div class="field">
+        <label>Date per Check:</label>
+        <input type="date" name="date" required>
+      </div>
+
+      <div class="field">
+        <label>Account / Fund:</label>
+          <select name="accountType" required style="width: 100%; padding: 8px;">
+            <option value="GOF">GOF (General Operating Fund)</option>
+            <option value="CPF">CPF (Corporate Partnership Fund)</option>
+            <option value="RCA">RCA (Rice Collection Account)</option>
+            <option value="MSC">MSC (Miscellaneous)</option>
+          </select>
+      </div>
+
+      <div class="field">
+        <label>Check Number:</label>
+        <input type="text" name="checkNo" required placeholder="e.g. 1723846" style="width: 100%; padding: 8px;">
+      </div>
+
+      <div class="field">
+        <label>Payee / Creditor:</label>
+        <input type="text" name="payee" required placeholder="e.g. PHILHEALTH">
+      </div>
+
+      <div class="field">
+        <label>Particulars:</label>
+        <textarea name="particulars" placeholder="Brief description of payment.." style="width: 100%; padding: 8px;"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Amount:</label>
+        <input type="number" name="amount" step="0.01" required style="width: 100%; padding: 8px;">
+      </div>
+
+      <div class="field alignEnd">
+        <button class="nav pnav wpx150" type="submit">Save Check</button>
+      </div>
+    </form>
+</div>
+
+<div class="col fixed centerAll bgWhite shadow2 justifyStart top0 right0 padding20 unseen" id="editOutCard">
+  <form action="/editOUT" method="POST">
+    <input type="hidden" name="id" id="editOutId">
+
+    <div class="field">
+      <p class="size30 medium">Edit Outstanding Check</p>
+    </div>
+
+    <div class="field">
+      <label>Date Issued:</label>
+      <input type="date" name="date" id="editOutDate" required>
+    </div>
+
+    <div class="field">
+      <label>Account / Fund:</label>
+      <select name="accountType" id="editOutAccountType" required style="width: 100%; padding: 8px;">
+        <option value="GOF">GOF</option>
+        <option value="CPF">CPF</option>
+        <option value="RCA">RCA</option>
+        <option value="MSC">MSC</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Check Number:</label>
+      <input type="text" name="checkNo" id="editOutCheckNo" required style="width: 100%; padding: 8px;">
+    </div>
+
+    <div class="field">
+      <label>Payee:</label>
+      <input type="text" name="payee" id="editOutPayee" required style="width: 100%; padding: 8px;">
+    </div>
+
+    <div class="field">
+      <label>Particulars:</label>
+      <input type="text" name="particulars" id="editOutParticulars" style="width: 100%; padding: 8px;">
+    </div>
+
+    <div class="field">
+      <label>Amount:</label>
+      <input type="number" name="amount" id="editOutAmount" step="0.01" required style="width: 100%; padding: 8px;">
+    </div>
+
+    <br>
+    <div class="height0 justifyBetween padding0">
+      <a href="javascript:void(0)" class="nav wpx150" id="cancelOutEdit">Cancel</a>
+      <button class="nav wpx150 pnav" type="submit">Update Record</button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const newCard = document.getElementById('newOutCard');
+  const newBtn = document.getElementById('newOutBtn');
+  const editCard = document.getElementById('editOutCard');
+
+  // Open New Form
+  newBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    newCard.classList.replace('unseen', 'seen');
+  });
+
+  // Open Edit Form
+  document.querySelectorAll('.editOutBtn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      editCard.classList.replace('unseen', 'seen');
+
+      document.getElementById('editOutId').value = btn.dataset.id;
+      document.getElementById('editOutDate').value = btn.dataset.date;
+      document.getElementById('editOutAccountType').value = btn.dataset.accounttype;
+      document.getElementById('editOutCheckNo').value = btn.dataset.checkno;
+      document.getElementById('editOutPayee').value = btn.dataset.payee;
+      document.getElementById('editOutParticulars').value = btn.dataset.particulars || '';
+      document.getElementById('editOutAmount').value = btn.dataset.amount;
+    });
+  });
+
+  // Close cards on outside click
+  document.addEventListener('click', (e) => {
+    if (!newCard.contains(e.target)) newCard.classList.replace('seen', 'unseen');
+    if (!editCard.contains(e.target)) editCard.classList.replace('seen', 'unseen');
+  });
+
+  document.getElementById('cancelOutEdit').addEventListener('click', () => {
+    editCard.classList.replace('seen', 'unseen');
+  });
+
+  // Delete logic
+  document.querySelectorAll('.delOutBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Permanently remove this outstanding check entry?')) return;
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/deleteOUT';
+      const input = document.createElement('input');
+      input.type = 'hidden'; name = 'id'; input.name = 'id'; input.value = btn.dataset.id;
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
+
+  // Universal Search
+  const searchInput = document.getElementById('univ');
+  const table = document.getElementById('outTable');
+  const rows = document.querySelectorAll('#outTable tbody tr');
+  const noFound = document.querySelector('.noFound');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    let count = 0;
+    rows.forEach(row => {
+      const match = row.textContent.toLowerCase().includes(query);
+      row.style.display = match ? '' : 'none';
+      if (match) count++;
+    });
+    table.style.display = count ? '' : 'none';
+    noFound.style.display = count ? 'none' : 'block';
+  });
+});
+</script>
