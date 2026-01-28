@@ -700,7 +700,7 @@ app.post('/importExcel', upload.single('excelFile'), async (req, res) => {
 
                 return {
                     date: dateVal,
-                    accountType: row[1] || req.body.accountType || 'GOF', // Column B
+                    accountType: row[1] ? String(row[1]).trim() : (req.body.accountType || 'GOF').trim(),
                     checkNo: row[2] ? String(row[2]).trim() : "", // Column C
                     voucherNo: row[3] ? String(row[3]).trim() : "", // Column D
                     desc: `${row[4] || ''} - ${row[5] || ''}`.trim(), // Col E & F
@@ -735,7 +735,7 @@ if (bankSheet) {
 
         return {
             date: dateVal,
-            accountType: row[1] || req.body.accountType || 'GOF', // Column B
+            accountType: row[1] ? String(row[1]).trim() : (req.body.accountType || 'GOF').trim(),
             checkNo: row[2] ? String(row[2]).trim() : "",        // Column C
             desc: row[3] || "Bank Transaction (Incomplete Info)", // Column D
             amount: finalAmount,
@@ -763,7 +763,7 @@ if (bankSheet) {
 
                 return {
                     date: dateVal,
-                    accountType: row[1] || 'GOF',
+                    accountType: row[1] ? String(row[1]).trim() : 'GOF',
                     checkNo: row[2] ? String(row[2]).trim() : "",
                     payee: row[3] || "Unknown",
                     particulars: row[4] || "",

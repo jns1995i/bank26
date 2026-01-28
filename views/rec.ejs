@@ -62,10 +62,10 @@
     </div>
 </section>
 
-<section class="width100 justifyBetween padding0">
+<section class="width100 justifyBetween corner10 bgWhite">
     <p class="size30 str5">Bank Reconciliation Statement</p>
     <div class="area0 gap10">
-        <a href="javascript:void(0)" class="nav" id="settingBtn"><i class="fas fa-cog"></i> Set Beginning</a>
+        <a href="javascript:void(0)" class="nav" id="settingBtn"><i class="fas fa-cog"></i> Set Ending</a>
         |
         <a href="javascript:void(0)" class="nav bgBlue900" id="importBtn"><i class="fas fa-file-excel"></i> Import Report</a>
         <a href="javascript:void(0)" class="nav bgRed700" id="exportPdf"><i class="fas fa-file-download"></i> Export Report</a>
@@ -103,7 +103,7 @@
                 <label>Select Master Account (for Book/Bank sheets):</label>
                 <select name="accountType" class="width100 padding10">
                     <option value="GOF">GOF (General Operating Fund)</option>
-                    <option value="CPF">CPF (Corporate Partnership Fund)</option>
+                    <option value="CPF">CPF (Cereal Procurement Fund)</option>
                     <option value="RCA">RCA (Rice Collection Account)</option>
                 </select>
             </div>
@@ -126,10 +126,10 @@
     </div>
 
 
-<div class="height0 gap15">
-    <div class="col alignStart justifyStart padding10 gap10">
+<div class="height0 gap15 alignStart corner10 padding0">
+    <div class="col alignStart justifyStart padding0 gap10">
         <table style="width: 100%;">
-            <tr><th colspan="2">Bank Side</th></tr>
+            <tr><th colspan="2" class="bgBlue100 border0">Bank Side</th></tr>
             <tr>
                 <td>Unadjusted Bank Balance</td>
                 <td class="text-right"><strong><%= data.bankBal.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></td>
@@ -149,9 +149,9 @@
         </table>
     </div>
 
-    <div class="col alignStart justifyStart padding10 gap10">
+    <div class="col alignStart justifyStart paddin0 gap10">
         <table style="width: 100%;">
-            <tr><th colspan="2">Book Side</th></tr>
+            <tr><th colspan="2" class="bgRed100 border0">Book Side</th></tr>
             <tr>
                 <td>Unadjusted Book Balance</td>
                 <td class="text-right"><strong><%= data.bookBal.toLocaleString(undefined, {minimumFractionDigits: 2}) %></strong></td>
@@ -163,10 +163,9 @@
         </table>
     </div>
 </div>
-
 <br>
 
-<section class="justifyBetween gap10">
+<section class="justifyBetween gap10 bgWhite corner10">
     <div class="area0 gap10">
         <% if(Math.abs(data.diff) < 0.01) { %>
             <p class="noteGreen size16 width0"> STATUS: BALANCED <i class="fas fa-check-circle"></i></p>
@@ -176,11 +175,10 @@
     </div>
     <p class="str5 size16">Difference: <%= data.diff.toLocaleString(undefined, {minimumFractionDigits: 2}) %></p>
 </section>
+<br>
 
-<br><hr><br>
-
-<p class="size18 str5 marginLeft10">Outstanding Checks</p>
-<section class="gap10 col block alignStart overflowY hpx300 corner10 border05 borderStone300">
+<p class="size18 str5 marginLeft10 marginBottom10">Outstanding Checks</p>
+<section class="gap10 col block alignStart overflowY hpx300 corner10 border05 borderStone300 bgWhite">
     <table class="table" id="outstanding">
         <thead>
             <tr>
@@ -221,8 +219,8 @@
 
 <br>
 
-<p class="size18 str5 marginLeft10">Deposits in Transit</p>
-<section class="gap10 col block alignStart overflowY hpx200 corner10 border05 borderStone300">
+<p class="size18 str5 marginLeft10 marginBottom10">Deposits in Transit</p>
+<section class="gap10 col block alignStart overflowY hpx200 corner10 border05 borderStone300 bgWhite">
     <table class="table" id="deposit">
         <thead>
             <tr>
@@ -251,8 +249,8 @@
 
 <br>
 
-<p class="size18 str5 marginLeft10">Reconciling Items</p>
-<section class="gap10 col block alignStart overflowY hpx200 corner10 border05 borderStone300">
+<p class="size18 str5 marginLeft10 marginBottom10">Reconciling Items</p>
+<section class="gap10 col block alignStart overflowY hpx200 corner10 border05 borderStone300 bgWhite">
     <table class="table" id="reconciling">
         <thead>
             <tr>
