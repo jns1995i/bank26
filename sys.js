@@ -664,6 +664,15 @@ app.post('/importExcel', upload.single('excelFile'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).send('No file uploaded.');
 
+        // RESET DATABASE BEFORE IMPORT
+        await Promise.all([
+            Tr.deleteMany({}),
+            BankTr.deleteMany({}),
+            Out.deleteMany({}),
+            Reco.deleteMany({}),
+            Settings.deleteMany({})
+        ]);
+
         const workbook = XLSX.readFile(req.file.path);
         let totalImported = 0;
 
