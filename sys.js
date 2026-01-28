@@ -405,67 +405,46 @@ app.get('/rec', isLogin, isBankTr, isTr, isOut, async (req, res) => {
     const accountType = req.query.accountType || 'GOF';
     const asOfDate = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59, 999);
 
-    // 2. Fetch Settings (Unadjusted Balances from UI)
+    // 2. Fetch Settings
     const settings = await Settings.findOne({ accountType }) || { bookBeginning: 0, bankBeginning: 0 };
 
-    // 3. Fetch Transactions with Account & Date Filtering
-    // This ensures that the Book Side and Bank Side tables in the Excel export only show relevant data
+    // 3. Fetch Transactions
     const bookTars = await Tr.find({ accountType, date: { $lte: asOfDate } });
     const bankTars = await BankTr.find({ accountType, date: { $lte: asOfDate } });
+    const manualOuts = await Out.find({ accountType, date: { $lte: asOfDate }, archive: false });
 
-    const trs = bookTars.map(t => ({
-    ...t.toObject(),
-    dateFormatted: dayjs(t.date).format('MMM D, YYYY')
-    }));
-
-    const formattedBankTrs = bankTars.map(t => ({
-        ...t.toObject(),
-        dateFormatted: dayjs(t.date).format('MMM D, YYYY')
-    }));
-    
-    const manualOuts = await Out.find({ 
-        accountType, 
-        date: { $lte: asOfDate },
-        archive: false 
-    });
-
-    // 4. Calculate Unadjusted Balances using Settings as the starting point 
-   const bookBal = settings.bookBeginning; 
+    // 4. Manual Balances (From Settings)
+    const bookBal = settings.bookBeginning; 
     const bankBal = settings.bankBeginning;
 
-    // 5. REVISED OUTSTANDING LOGIC (Fixes the "too large" OC issue) [cite: 3, 9]
-    // Identify all checks that have cleared the bank (Bank Debits)
+    // 5. UNIFIED OUTSTANDING LOGIC
     const clearedCheckNos = bankTars
         .filter(t => t.type === 'Debit' && t.checkNo)
         .map(b => b.checkNo);
 
-    // CURRENT: Book debits (checks issued) NOT yet in the bank [cite: 11]
-    const outstandingCurrent = bookTars.filter(t => 
-        t.type === 'Debit' && 
-        t.checkNo && 
-        !clearedCheckNos.includes(t.checkNo)
+    // Current month Book checks not in Bank
+    const bookOC = bookTars.filter(t => 
+        t.type === 'Debit' && t.checkNo && !clearedCheckNos.includes(t.checkNo)
     );
 
-    // PREVIOUS: Manual entries STILL NOT cleared in the bank [cite: 12]
-    const outstandingPrevious = manualOuts.filter(m => 
-        !clearedCheckNos.includes(m.checkNo)
-    );
+    // Manual Previous OCs not in Bank
+    const manualOC = manualOuts.filter(m => !clearedCheckNos.includes(m.checkNo));
 
-    const totalOC = [...outstandingCurrent, ...outstandingPrevious].reduce((sum, item) => sum + item.amount, 0);
+    // Combine for UI and Calculations
+    const allOutstanding = [...bookOC, ...manualOC];
+    const totalOC = allOutstanding.reduce((sum, item) => sum + item.amount, 0);
 
-    // 6. DEPOSITS IN TRANSIT (Book Credits not in Bank Credits)
+    // 6. DEPOSITS IN TRANSIT
     const clearedBankDepositNos = bankTars
         .filter(t => t.type === 'Credit' && t.checkNo)
         .map(b => b.checkNo);
 
     const depositsInTransit = bookTars.filter(t => 
-        t.type === 'Credit' && 
-        t.checkNo && 
-        !clearedBankDepositNos.includes(t.checkNo)
+        t.type === 'Credit' && t.checkNo && !clearedBankDepositNos.includes(t.checkNo)
     );
     const totalDeposits = depositsInTransit.reduce((sum, item) => sum + item.amount, 0);
 
-    // 7. RECONCILING ITEMS (Rename requirement)
+    // 7. RECONCILING ITEMS (Bank transactions with no book match)
     const bankOnlyDebits = bankTars.filter(b => b.type === 'Debit' && !b.checkNo);
     const bankOnlyCredits = bankTars.filter(b => 
         b.type === 'Credit' && 
@@ -477,36 +456,45 @@ app.get('/rec', isLogin, isBankTr, isTr, isOut, async (req, res) => {
     const adjBank = bankBal - totalOC + totalDeposits;
     const diff = adjBank - bookBal;
 
+    // --- DATABASE UPDATES (Automated Status Syncing) ---
+
+    // 1. Mark Book items as Reconciled (Matched) or Still Outstanding (Unmatched)
+    const clearedBookIds = bookTars.filter(t => t.type === 'Debit' && t.checkNo && clearedCheckNos.includes(t.checkNo)).map(t => t._id);
+    const stillOutstandingBookIds = bookOC.map(t => t._id); // Changed from outstandingCurrent to bookOC
+
+    if (clearedBookIds.length > 0) await Tr.updateMany({ _id: { $in: clearedBookIds } }, { status: 'Reconciled' });
+    if (stillOutstandingBookIds.length > 0) await Tr.updateMany({ _id: { $in: stillOutstandingBookIds } }, { status: 'Still Outstanding' });
+
+    // 2. Mark Bank items as Reconciled
+    const matchedBankIds = bankTars.filter(t => t.type === 'Debit' && t.checkNo && bookTars.some(bt => bt.checkNo === t.checkNo)).map(t => t._id);
+    if (matchedBankIds.length > 0) await BankTr.updateMany({ _id: { $in: matchedBankIds } }, { status: 'Reconciled' });
+
+    // 3. Update Manual Outs
+    for (let manual of manualOuts) {
+        let newStatus = clearedCheckNos.includes(manual.checkNo) ? 'Cleared' : 'Still Outstanding';
+        await Out.findByIdAndUpdate(manual._id, { status: newStatus });
+    }
+
+    // Prepare data for Frontend
+    const formattedTrs = bookTars.map(t => ({ ...t.toObject(), dateFormatted: dayjs(t.date).format('MMM D, YYYY') }));
+    const formattedBankTrs = bankTars.map(t => ({ ...t.toObject(), dateFormatted: dayjs(t.date).format('MMM D, YYYY') }));
+
     res.render('rec', {
       title: 'Reconciliation Reports',
       active: 'rec',
       data: {
-        settings,
-        bankBal,
-        bookBal,
-        totalOC,
-        outstandingCurrent,
-        outstandingPrevious,
-        depositsInTransit,
-        totalDeposits,
-        reconcilingItems, 
-        discrepancies: reconcilingItems, 
-        adjBank,
-        diff,
-        selectedMonth,
-        selectedYear,
-        accountType,
-        asOfDate
+        settings, bankBal, bookBal, totalOC, allOutstanding, 
+        depositsInTransit, totalDeposits, reconcilingItems, adjBank, diff,
+        selectedMonth, selectedYear, accountType, asOfDate
       },
-      // Now filtered by accountType and asOfDate for correct Excel exporting
-      trs: trs, // This matches <% trs.forEach %>
-      bankTrs: formattedBankTrs, // This matches <% bankTrs.forEach %>
+      trs: formattedTrs, 
+      bankTrs: formattedBankTrs,
       months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
       currentYear: now.getFullYear()
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("CRITICAL ERROR IN /REC:", err);
     res.status(500).send("Internal Server Error");
   }
 });

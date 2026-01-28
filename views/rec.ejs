@@ -192,24 +192,29 @@
             </tr>
         </thead>
         <tbody>
-            <% data.outstandingCurrent.forEach(oc => { %>
+            <% if (data.allOutstanding && data.allOutstanding.length > 0) { %>
+                <% data.allOutstanding.forEach(oc => { %>
+                    <tr>
+                        <td>
+                            <% if (oc.voucherNo) { %>
+                                <span class="noteGray">CURRENT</span>
+                            <% } else { %>
+                                <span class="noteOrange">PREVIOUS</span>
+                            <% } %>
+                        </td>
+                        <td><%= oc.date ? new Date(oc.date).toDateString() : 'N/A' %></td>
+                        <td><%= oc.checkNo %></td>
+                        <td><%= oc.description || oc.desc || oc.payee || '---' %></td>
+                        <td class="text-right">
+                            <%= (oc.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) %>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
                 <tr>
-                    <td><span class="noteGray">CURRENT</span></td>
-                    <td><%= oc.date.toDateString() %></td>
-                    <td><%= oc.checkNo %></td>
-                    <td><%= oc.desc %></td>
-                    <td class="text-right"><%= oc.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
+                    <td colspan="5" class="center noteGray">No outstanding checks found.</td>
                 </tr>
-            <% }) %>
-            <% data.outstandingPrevious.forEach(oc => { %>
-                <tr>
-                    <td><span class="noteOrange">PREVIOUS</span></td>
-                    <td><%= oc.date.toDateString() %></td>
-                    <td><%= oc.checkNo %></td>
-                    <td><%= oc.desc %></td>
-                    <td class="text-right"><%= oc.amount.toLocaleString(undefined, {minimumFractionDigits: 2}) %></td>
-                </tr>
-            <% }) %>
+            <% } %>
         </tbody>
     </table>
 </section>
