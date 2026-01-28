@@ -399,20 +399,29 @@ app.get('/rec', isLogin, isBankTr, isTr, isOut, async (req, res) => {
   try {
     const now = new Date();
 
-    // Filters
+    // 1. Unified Filters
     const selectedMonth = req.query.month !== undefined ? Number(req.query.month) : now.getMonth();
     const selectedYear = req.query.year !== undefined ? Number(req.query.year) : now.getFullYear();
     const accountType = req.query.accountType || 'GOF';
     const asOfDate = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59, 999);
 
-    // --- NEW LOGIC START: Get Beginning Balances ---
-    // This fetches the starting numbers you saved in your settings
+    // 2. Fetch Settings (Unadjusted Balances from UI)
     const settings = await Settings.findOne({ accountType }) || { bookBeginning: 0, bankBeginning: 0 };
-    // --- NEW LOGIC END ---
 
-    // 1. Fetch Transactions + Manual Outstanding Checks
+    // 3. Fetch Transactions with Account & Date Filtering
+    // This ensures that the Book Side and Bank Side tables in the Excel export only show relevant data
     const bookTars = await Tr.find({ accountType, date: { $lte: asOfDate } });
     const bankTars = await BankTr.find({ accountType, date: { $lte: asOfDate } });
+
+    const trs = bookTars.map(t => ({
+    ...t.toObject(),
+    dateFormatted: dayjs(t.date).format('MMM D, YYYY')
+    }));
+
+    const formattedBankTrs = bankTars.map(t => ({
+        ...t.toObject(),
+        dateFormatted: dayjs(t.date).format('MMM D, YYYY')
+    }));
     
     const manualOuts = await Out.find({ 
         accountType, 
@@ -420,54 +429,51 @@ app.get('/rec', isLogin, isBankTr, isTr, isOut, async (req, res) => {
         archive: false 
     });
 
-    // --- UPDATED: Using settings as the seed for reduce ---
-    const bookBal = bookTars.reduce((acc, curr) => curr.type === 'Credit' ? acc + curr.amount : acc - curr.amount, settings.bookBeginning);
-    const bankBal = bankTars.reduce((acc, curr) => curr.type === 'Credit' ? acc + curr.amount : acc - curr.amount, settings.bankBeginning);
+    // 4. Calculate Unadjusted Balances using Settings as the starting point 
+   const bookBal = settings.bookBeginning; 
+    const bankBal = settings.bankBeginning;
 
-    // 2. REVISED: Outstanding Checks Logic
+    // 5. REVISED OUTSTANDING LOGIC (Fixes the "too large" OC issue) [cite: 3, 9]
+    // Identify all checks that have cleared the bank (Bank Debits)
     const clearedCheckNos = bankTars
         .filter(t => t.type === 'Debit' && t.checkNo)
         .map(b => b.checkNo);
 
-    const bookChecks = bookTars.filter(t => t.type === 'Debit' && t.checkNo && !clearedCheckNos.includes(t.checkNo));
-    const manualChecks = manualOuts.filter(m => !clearedCheckNos.includes(m.checkNo));
+    // CURRENT: Book debits (checks issued) NOT yet in the bank [cite: 11]
+    const outstandingCurrent = bookTars.filter(t => 
+        t.type === 'Debit' && 
+        t.checkNo && 
+        !clearedCheckNos.includes(t.checkNo)
+    );
 
-    const combinedOutstanding = [...bookChecks];
-    manualChecks.forEach(mc => {
-        if (!combinedOutstanding.some(bc => bc.checkNo === mc.checkNo)) {
-            combinedOutstanding.push(mc);
-        }
-    });
+    // PREVIOUS: Manual entries STILL NOT cleared in the bank [cite: 12]
+    const outstandingPrevious = manualOuts.filter(m => 
+        !clearedCheckNos.includes(m.checkNo)
+    );
 
-    const totalOC = combinedOutstanding.reduce((sum, item) => sum + item.amount, 0);
+    const totalOC = [...outstandingCurrent, ...outstandingPrevious].reduce((sum, item) => sum + item.amount, 0);
 
-    // 3. Deposits in Transit
-    const allBookCredits = bookTars.filter(t => t.type === 'Credit' && t.checkNo);
-    const clearedBankCredits = bankTars.filter(t => t.type === 'Credit' && t.checkNo).map(b => b.checkNo);
-    const depositsInTransit = allBookCredits.filter(bc => !clearedBankCredits.includes(bc.checkNo));
+    // 6. DEPOSITS IN TRANSIT (Book Credits not in Bank Credits)
+    const clearedBankDepositNos = bankTars
+        .filter(t => t.type === 'Credit' && t.checkNo)
+        .map(b => b.checkNo);
+
+    const depositsInTransit = bookTars.filter(t => 
+        t.type === 'Credit' && 
+        t.checkNo && 
+        !clearedBankDepositNos.includes(t.checkNo)
+    );
     const totalDeposits = depositsInTransit.reduce((sum, item) => sum + item.amount, 0);
 
-    // 4. Discrepancies
+    // 7. RECONCILING ITEMS (Rename requirement)
     const bankOnlyDebits = bankTars.filter(b => b.type === 'Debit' && !b.checkNo);
-    const bankOnlyCredits = bankTars.filter(
-      b => b.type === 'Credit' && !allBookCredits.some(bc => bc.checkNo === b.checkNo)
+    const bankOnlyCredits = bankTars.filter(b => 
+        b.type === 'Credit' && 
+        !bookTars.some(book => book.checkNo === b.checkNo && book.type === 'Credit')
     );
-    const discrepancies = [...bankOnlyDebits, ...bankOnlyCredits];
+    const reconcilingItems = [...bankOnlyDebits, ...bankOnlyCredits];
 
-    // 5. Update Reconciled Status
-    for (let check of combinedOutstanding) {
-        const matchedBank = bankTars.find(b => b.checkNo === check.checkNo);
-        if (matchedBank) {
-            if (check.status !== 'Reconciled') await Tr.findByIdAndUpdate(check._id, { status: 'Reconciled' });
-            if (matchedBank.status !== 'Reconciled') await BankTr.findByIdAndUpdate(matchedBank._id, { status: 'Reconciled' });
-            
-            if (check.constructor.modelName === 'out') {
-                await Out.findByIdAndUpdate(check._id, { status: 'Cleared' });
-            }
-        }
-    }
-
-    // 6. Adjusted Balances
+    // 8. Adjusted Balances
     const adjBank = bankBal - totalOC + totalDeposits;
     const diff = adjBank - bookBal;
 
@@ -475,14 +481,16 @@ app.get('/rec', isLogin, isBankTr, isTr, isOut, async (req, res) => {
       title: 'Reconciliation Reports',
       active: 'rec',
       data: {
-        settings, // Added so you can show Beginning Balances in the UI
+        settings,
         bankBal,
         bookBal,
         totalOC,
-        outstandingList: combinedOutstanding,
+        outstandingCurrent,
+        outstandingPrevious,
         depositsInTransit,
         totalDeposits,
-        discrepancies,
+        reconcilingItems, 
+        discrepancies: reconcilingItems, 
         adjBank,
         diff,
         selectedMonth,
@@ -490,6 +498,9 @@ app.get('/rec', isLogin, isBankTr, isTr, isOut, async (req, res) => {
         accountType,
         asOfDate
       },
+      // Now filtered by accountType and asOfDate for correct Excel exporting
+      trs: trs, // This matches <% trs.forEach %>
+      bankTrs: formattedBankTrs, // This matches <% bankTrs.forEach %>
       months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
       currentYear: now.getFullYear()
     });
@@ -714,29 +725,44 @@ app.post('/importExcel', upload.single('excelFile'), async (req, res) => {
             if (entries.length) { await Tr.insertMany(entries); totalImported += entries.length; }
         }
 
-        // 2. PROCESS BANK
-        const bankSheet = getSheet('bank');
-        if (bankSheet) {
-            const rows = XLSX.utils.sheet_to_json(bankSheet, { header: 1 });
-            const entries = rows.slice(1).map(row => {
-                const dateVal = parseDate(row[0]);
-                const dr = parseFloat(row[4] || 0); // Column E
-                const cr = parseFloat(row[5] || 0); // Column F
-                if (!dateVal || (dr === 0 && cr === 0)) return null;
+        // 2. PROCESS BANK (REVISED TO PREVENT SKIPPING)
+const bankSheet = getSheet('bank');
+if (bankSheet) {
+    const rows = XLSX.utils.sheet_to_json(bankSheet, { header: 1 });
+    console.log(`--- Processing Bank Sheet: ${rows.length} rows detected ---`);
 
-                return {
-                    date: dateVal,
-                    accountType: row[1] || req.body.accountType || 'GOF',
-                    checkNo: row[2] ? String(row[2]).trim() : "",
-                    desc: row[3] || "Bank Transaction",
-                    amount: dr || cr,
-                    type: dr > 0 ? 'Debit' : 'Credit',
-                    status: 'Recorded',
-                    dump: true
-                };
-            }).filter(e => e !== null);
-            if (entries.length) { await BankTr.insertMany(entries); totalImported += entries.length; }
+    const entries = rows.slice(1).map((row, index) => {
+        // FALLBACK LOGIC: If date is missing/invalid, use current date instead of skipping
+        let dateVal = parseDate(row[0]);
+        if (!dateVal) {
+            dateVal = new Date(); // Use today's date as fallback
+            console.log(`⚠️ Row ${index + 2}: Missing date, defaulted to today.`);
         }
+
+        const dr = parseFloat(row[4] || 0); // Column E
+        const cr = parseFloat(row[5] || 0); // Column F
+        
+        // Even if there is no amount, we create a record with 0.00
+        const finalAmount = dr !== 0 ? dr : cr;
+
+        return {
+            date: dateVal,
+            accountType: row[1] || req.body.accountType || 'GOF', // Column B
+            checkNo: row[2] ? String(row[2]).trim() : "",        // Column C
+            desc: row[3] || "Bank Transaction (Incomplete Info)", // Column D
+            amount: finalAmount,
+            type: dr > 0 ? 'Debit' : 'Credit',
+            status: 'Recorded',
+            dump: true
+        };
+    }); // REMOVED THE .filter() so we keep every row
+
+    if (entries.length > 0) {
+        await BankTr.insertMany(entries);
+        totalImported += entries.length;
+        console.log(`✅ Forced Import: ${entries.length} Bank records saved.`);
+    }
+}
 
         // 3. PROCESS OC
         const ocSheet = getSheet('oc');
