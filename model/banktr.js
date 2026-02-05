@@ -8,7 +8,7 @@ const banktrSchema = new mongoose.Schema({
   // 1. ADD: Which account this bank statement belongs to
   accountType: {
     type: String,
-    enum: ['GOF', 'CPF', 'RCA', 'MSC'],
+    trim: true,
     required: true
   },
 

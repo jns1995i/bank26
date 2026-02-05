@@ -8,7 +8,7 @@ const trSchema = new mongoose.Schema({
   // 1. ADD: The Fund/Account type (GOF, CPF, RCA, MSC)
   accountType: {
     type: String,
-    enum: ['GOF', 'CPF', 'RCA', 'MSC'],
+    trim: true,
     required: true
   },
 

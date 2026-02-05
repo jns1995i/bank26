@@ -9,7 +9,7 @@ const outSchema = new mongoose.Schema({
   // Matches the account types from your banktr
   accountType: {
     type: String,
-    enum: ['GOF', 'CPF', 'RCA', 'MSC'],
+    trim: true,
     required: true
   },
 
