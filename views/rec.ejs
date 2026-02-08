@@ -74,6 +74,7 @@
 
 <br>
 
+
 <div class="width25 height100 fixed right20 top0 padding20 shadow2 col index50 bgWhite unseen" id="settingCard">
     <form action="/update-settings" method="POST">
         <input type="hidden" name="accountType" value="<%= data.accountType %>">
@@ -339,25 +340,67 @@
 
 <script>
 document.getElementById('exportPdf').addEventListener('click', async () => {
-    // PDF Export Logic
+
+    // 🔐 PASSWORD VERIFICATION FIRST
+    const input = prompt("Please enter your password to export:");
+
+    if (input === null || input.trim() === '') return;
+
+    try {
+        const res = await fetch('/verify-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password: input })
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            alert("Incorrect Password");
+            return;
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Password verification failed");
+        return;
+    }
+
+    // ===============================
+    // ✅ PDF EXPORT LOGIC
+    // ===============================
     const { jsPDF } = window.jspdf;
     const report = document.getElementById('report');
     const wrapper = report.closest('.hidden');
+
     wrapper.classList.remove('hidden');
-    
+
     const canvas = await html2canvas(report, { scale: 2 });
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'letter');
-    pdf.addImage(imgData, 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), (canvas.height * pdf.internal.pageSize.getWidth()) / canvas.width);
+
+    pdf.addImage(
+        imgData,
+        'PNG',
+        0,
+        0,
+        pdf.internal.pageSize.getWidth(),
+        (canvas.height * pdf.internal.pageSize.getWidth()) / canvas.width
+    );
+
     pdf.save('Bank-Reconciliation.pdf');
     wrapper.classList.add('hidden');
 
-    // Excel Export Logic (Revised Sheet Names)
+    // ===============================
+    // ✅ EXCEL EXPORT LOGIC
+    // ===============================
     const wb = XLSX.utils.book_new();
     const tables = [
         { el: 'outstanding', name: 'Outstanding Checks' },
         { el: 'deposit', name: 'Deposits in Transit' },
-        { el: 'reconciling', name: 'Reconciling Items' }, // Renamed from Discrepancies
+        { el: 'reconciling', name: 'Reconciling Items' },
         { el: 'bank', name: 'Bank Side' },
         { el: 'book', name: 'Book Side' }
     ];
@@ -369,51 +412,83 @@ document.getElementById('exportPdf').addEventListener('click', async () => {
             XLSX.utils.book_append_sheet(wb, ws, t.name);
         }
     });
+
     XLSX.writeFile(wb, 'Bank-Reconciliation-Report.xlsx');
+
 });
 </script>
 
+
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Function to handle toggle logic
-    const setupToggle = (btnId, cardId) => {
-      const btn = document.getElementById(btnId);
-      const card = document.getElementById(cardId);
+document.addEventListener('DOMContentLoaded', () => {
 
-      if (!btn || !card) return;
+  const verifyPassword = async () => {
+    const input = prompt("Please enter your password:");
 
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        
-        // Optional: Close other open cards before opening this one
-        document.querySelectorAll('.seen').forEach(openCard => {
-            if(openCard !== card) {
-                openCard.classList.replace('seen', 'unseen');
-            }
-        });
+    if (input === null || input.trim() === '') return false;
 
-        card.classList.remove('unseen');
-        card.classList.add('seen');
+    try {
+      const res = await fetch('/verify-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: input })
       });
 
-      card.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
-    };
+      const data = await res.json();
 
-    // Initialize for Import
-    setupToggle('importBtn', 'importCard');
-    
-    // Initialize for Settings
-    setupToggle('settingBtn', 'settingCard');
+      if (!data.success) {
+        alert("Incorrect Password");
+        return false;
+      }
 
-    // Global click to close any open card
-    document.addEventListener('click', () => {
-      const openCards = document.querySelectorAll('.seen');
-      openCards.forEach(card => {
-        card.classList.remove('seen');
-        card.classList.add('unseen');
+      return true;
+
+    } catch (err) {
+      console.error(err);
+      alert("Verification failed");
+      return false;
+    }
+  };
+
+  const setupToggle = (btnId, cardId) => {
+    const btn = document.getElementById(btnId);
+    const card = document.getElementById(cardId);
+
+    if (!btn || !card) return;
+
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+
+      // 🔐 PASSWORD CHECK FIRST
+      const allowed = await verifyPassword();
+      if (!allowed) return;
+
+      // Close other cards
+      document.querySelectorAll('.seen').forEach(openCard => {
+        if (openCard !== card) {
+          openCard.classList.replace('seen', 'unseen');
+        }
       });
+
+      card.classList.remove('unseen');
+      card.classList.add('seen');
+    });
+
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  };
+
+  setupToggle('importBtn', 'importCard');
+  setupToggle('settingBtn', 'settingCard');
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.seen').forEach(card => {
+      card.classList.replace('seen', 'unseen');
     });
   });
+
+});
 </script>

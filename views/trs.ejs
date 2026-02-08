@@ -286,21 +286,55 @@ searchInput.addEventListener('input', () => {
   </form>
 </div>
 <script>
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const editCard = document.getElementById('editTRCard');
   const cancelBtn = document.getElementById('cancelEdit');
 
-  // Open Edit Modal
+  // 🔐 Password verification helper
+  const verifyPassword = async () => {
+    const input = prompt("Please enter your password:");
+
+    if (input === null || input.trim() === '') return false;
+
+    try {
+      const res = await fetch('/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: input })
+      });
+
+      const result = await res.json();
+
+      if (!result.success) {
+        alert("Incorrect Password");
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      alert("Password verification failed");
+      return false;
+    }
+  };
+
+  // ===============================
+  // 🔐 OPEN EDIT MODAL (PROTECTED)
+  // ===============================
   document.querySelectorAll('.editBtn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation(); // important
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+
+      // 🔐 Ask password BEFORE opening
+      const allowed = await verifyPassword();
+      if (!allowed) return;
 
       editCard.classList.remove('unseen');
       editCard.classList.add('seen');
 
       // Populate form
       document.getElementById('editTRId').value = btn.dataset.id;
-      document.getElementById('editDate').value = btn.dataset.date; // YYYY-MM-DD ✅
+      document.getElementById('editDate').value = btn.dataset.date; // YYYY-MM-DD
       document.getElementById('editAccountType').value = btn.dataset.accounttype;
       document.getElementById('editVoucherNo').value = btn.dataset.voucherno || '';
       document.getElementById('editCheckNo').value = btn.dataset.checkno || '';
@@ -327,6 +361,4 @@ searchInput.addEventListener('input', () => {
   // Prevent click inside modal from closing it
   editCard.addEventListener('click', e => e.stopPropagation());
 });
-
-
 </script>

@@ -782,6 +782,35 @@ if (bankSheet) {
     }
 });
 
+app.post('/verify-password', isLogin, async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.json({ success: false });
+    }
+
+    // Get logged-in user from session
+    const user = await Users.findById(req.session.user._id);
+
+    if (!user) {
+      return res.json({ success: false });
+    }
+
+    // ❌ No bcrypt (plain compare)
+    if (user.password !== password) {
+      return res.json({ success: false });
+    }
+
+    return res.json({ success: true });
+
+  } catch (err) {
+    console.error('Password verify error:', err);
+    return res.json({ success: false });
+  }
+});
+
+
 app.use((req, res) => {
   res.status(404);
   res.locals.error = 'Oops! Page cannot be found!';

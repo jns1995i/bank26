@@ -167,16 +167,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const newBtn = document.getElementById('newOutBtn');
   const editCard = document.getElementById('editOutCard');
 
-  // Open New Form
-  newBtn.addEventListener('click', e => {
+  // 🔐 Password verification helper
+  const verifyPassword = async () => {
+    const input = prompt("Please enter your password:");
+
+    if (input === null || input.trim() === '') return false;
+
+    try {
+      const res = await fetch('/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: input })
+      });
+
+      const result = await res.json();
+
+      if (!result.success) {
+        alert("Incorrect Password");
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      alert("Password verification failed");
+      return false;
+    }
+  };
+
+  // ===============================
+  // 🔐 OPEN NEW FORM (PROTECTED)
+  // ===============================
+  newBtn.addEventListener('click', async e => {
     e.stopPropagation();
+
+    const allowed = await verifyPassword();
+    if (!allowed) return;
+
     newCard.classList.replace('unseen', 'seen');
   });
 
-  // Open Edit Form
+  // ===============================
+  // 🔐 OPEN EDIT FORM (PROTECTED)
+  // ===============================
   document.querySelectorAll('.editOutBtn').forEach(btn => {
-    btn.addEventListener('click', e => {
+    btn.addEventListener('click', async e => {
       e.stopPropagation();
+
+      const allowed = await verifyPassword();
+      if (!allowed) return;
+
       editCard.classList.replace('unseen', 'seen');
 
       document.getElementById('editOutId').value = btn.dataset.id;
@@ -189,7 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Close cards on outside click
+  // ===============================
+  // CLOSE ON OUTSIDE CLICK
+  // ===============================
   document.addEventListener('click', (e) => {
     if (!newCard.contains(e.target)) newCard.classList.replace('seen', 'unseen');
     if (!editCard.contains(e.target)) editCard.classList.replace('seen', 'unseen');
@@ -199,22 +241,35 @@ document.addEventListener('DOMContentLoaded', () => {
     editCard.classList.replace('seen', 'unseen');
   });
 
-  // Delete logic
+  // ===============================
+  // DELETE (unchanged)
+  // ===============================
   document.querySelectorAll('.delOutBtn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
+
+      const allowed = await verifyPassword();
+      if (!allowed) return;
+
       if (!confirm('Permanently remove this outstanding check entry?')) return;
+
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/deleteOUT';
+
       const input = document.createElement('input');
-      input.type = 'hidden'; name = 'id'; input.name = 'id'; input.value = btn.dataset.id;
+      input.type = 'hidden';
+      input.name = 'id';
+      input.value = btn.dataset.id;
+
       form.appendChild(input);
       document.body.appendChild(form);
       form.submit();
     });
   });
 
-  // Universal Search
+  // ===============================
+  // UNIVERSAL SEARCH
+  // ===============================
   const searchInput = document.getElementById('univ');
   const table = document.getElementById('outTable');
   const rows = document.querySelectorAll('#outTable tbody tr');
@@ -223,11 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
     let count = 0;
+
     rows.forEach(row => {
       const match = row.textContent.toLowerCase().includes(query);
       row.style.display = match ? '' : 'none';
       if (match) count++;
     });
+
     table.style.display = count ? '' : 'none';
     noFound.style.display = count ? 'none' : 'block';
   });

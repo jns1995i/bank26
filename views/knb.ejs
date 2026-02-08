@@ -229,7 +229,6 @@ searchInput.addEventListener('input', () => {
     }
 });
 </script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const newCard = document.getElementById('newTRCard');
@@ -248,11 +247,47 @@ document.addEventListener('DOMContentLoaded', () => {
     newCard.classList.add('unseen');
   });
 
-  // Edit bank transactions
+  // 🔐 Password verification helper
+  const verifyPassword = async () => {
+    const input = prompt("Please enter your password:");
+
+    if (input === null || input.trim() === '') return false;
+
+    try {
+      const res = await fetch('/verify-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: input })
+      });
+
+      const result = await res.json();
+
+      if (!result.success) {
+        alert("Incorrect Password");
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      alert("Password verification failed");
+      return false;
+    }
+  };
+
+  // ===============================
+  // 🔐 EDIT TRANSACTION (PROTECTED)
+  // ===============================
   const editCard = document.getElementById('editTRCard');
+
   document.querySelectorAll('.editBtn').forEach(btn => {
-    btn.addEventListener('click', e => {
+    btn.addEventListener('click', async e => {
       e.stopPropagation();
+
+      // 🔐 ASK PASSWORD FIRST
+      const allowed = await verifyPassword();
+      if (!allowed) return;
+
       editCard.classList.remove('unseen');
       editCard.classList.add('seen');
 
@@ -279,7 +314,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Delete bank transactions
+  // ===============================
+  // DELETE (unchanged)
+  // ===============================
   document.querySelectorAll('.delBtn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault();
@@ -300,7 +337,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Search/filter
+  // ===============================
+  // SEARCH / FILTER
+  // ===============================
   const searchInput = document.getElementById('univ');
   const table = document.querySelector('.tCard');
   const rows = document.querySelectorAll('.tCard tbody tr');
@@ -329,3 +368,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
